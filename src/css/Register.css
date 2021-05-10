@@ -1,0 +1,28 @@
+.pokemonForm{
+    max-width: 500px;
+    min-width:400px;
+}
+#routerContainer{
+    height:100%;
+    width:100%
+}
+#flexContainer{
+    height:100%;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+}
+#formDiv{
+    height:auto;
+    width:fit-content;
+    padding:20px;
+    background: whitesmoke;
+    opacity: .95;
+    border-radius: 50px;
+
+}
+.container{
+    height: 100%;
+    background: url(https://images6.alphacoders.com/893/thumb-1920-893634.png);
+    background-size: cover;
+}
