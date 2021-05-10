@@ -7,20 +7,16 @@ import Register from "./Register";
 import Login from "./Login";
 import Home from "./Home";
 import Profile from "./Profile";
+import CreateBingoCard from "./CreateBingoCard";
 
 
 export default()=>{
     const [cards, setCards] = useState([])
     const [user, setUser] = useState(null);
+    const [groups, setGroups] = useState([])
+    const [bingoCards, setBingoCards] = useState([])
 
     useEffect(()=>{
-        axios.get("http://localhost:8090/cards")
-            .then(response => {
-                console.log(response.data);
-                setCards(response.data)
-            })
-
-
         // pokemon.card.where({ q: 'set.id:base1' })
         //     .then(set=>{
         //         console.log(set);
@@ -38,43 +34,52 @@ export default()=>{
         //         }
         //     });
 
-        const setUser = (loggedInUser) =>{
-           setUser(loggedInUser)
 
-           //will do ajax call to internal api to get all users groups.
-            let url="http://localhost:8090/profile/"+loggedInUser.id+"/groups"
-            axios.get(url)
-                .then(response=> {
-                    console.log(response);
-                    user.groups=response.data;
-                    setUser(user)
-                    console.log(user);
-                })
-        }
 
 
     },[])
+    const onLogin = (loggedInUser) =>{
+        setUser(loggedInUser)
+        //
+        // //will do ajax call to internal api to get all users groups.
+        // let url="http://localhost:8090/profile/"+loggedInUser.id+"/groups"
+        // axios.get(url)
+        //     .then(response=> {
+        //         console.log(response);
+        //         setGroups(response.data)
+        //     })
+
+        //will do a separate ajax call to get all bingo cards
+         let url="http://localhost:8090/profile/"+loggedInUser.id+"/bingoCard"
+        axios.get(url)
+            .then(response=> {
+                console.log(response);
+                setGroups(response.data.groups);
+                setBingoCards(response.data.bingoCards)
+            })
+    }
         return (
             <div className="container" style={{height: "100%"}}>
                 <BrowserRouter>
                     <div id="routerContainer">
                         <Route exact path="/">
-                            {user===null ? <Redirect to="/login" /> : <Home setUser={setUser}/>}
+                            {user===null ? <Redirect to="/login" /> : <Home setUser={onLogin}/>}
 
                         </Route>
                         <Route exact path="/group/bingo">
                             <BingoCard cards={cards} user={user}/>
                         </Route>
                         <Route exact path="/register">
-                            {user!==null ? <Redirect to="/profile" /> : <Register setUser={setUser}/>}
+                            {user!==null ? <Redirect to="/profile" /> : <Register setUser={onLogin}/>}
                         </Route>
                         <Route exact path="/login">
-                            {user!==null ? <Redirect to="/profile" /> : <Login setUser={setUser}/>}
+                            {user!==null ? <Redirect to="/profile" /> : <Login setUser={onLogin}/>}
                         </Route>
                         <Route exact path="/profile">
-                            {user===null ? <Redirect to="/login" /> : <Profile setUser={setUser} user={user}/>}
-
-
+                            {user===null ? <Redirect to="/login" /> : <Profile setUser={onLogin} user={user} groups={groups} bingoCards={bingoCards}/>}
+                        </Route>
+                        <Route exact path="/bingo/create">
+                            {user===null ? <Redirect to="/login" /> : <CreateBingoCard groups={groups} user={user}/>}
                         </Route>
                     </div>
                 </BrowserRouter>
