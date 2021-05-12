@@ -1,13 +1,18 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import {Link} from "react-router-dom";
-// import "../css/Profile.css"
+import "../css/Profile.css"
 
 const Profile = (props) =>{
-    console.log(props);
+    console.log(props)
+    const [selectedBingo, setSelectedBingo] = useState(null)
+
+
+
     useEffect(()=>{
-        if (props.user===null){
-            window.location.replace("/login");
+        if (props.bingoCards.length>0) {
+            setSelectedBingo(props.bingoCards[0])
         }
+
     }, [])
 
     const renderedBingoCards = props.bingoCards.map(bingoCard=>{
@@ -17,6 +22,21 @@ const Profile = (props) =>{
             </a>
         )
     })
+    const renderBingoLink = () =>{
+        props.onSelectBingoCard(selectedBingo)
+        if (selectedBingo!==null){
+            console.log("returning bingoCard link")
+            return (
+                <Link to={"/group/"+selectedBingo.group.id+"/bingo"}>
+                    <div className="ui primary button">
+                        View Bingo Card</div></Link>
+            )
+        } else{
+            return (
+                <div></div>
+            )
+        }
+    }
 
     return (
         <div id="homeContainer">
@@ -40,15 +60,14 @@ const Profile = (props) =>{
                             </div>
                             <div className="twelve wide stretched column">
                                 <div className="ui segment">
-                                    This is an stretched grid column. This segment will always match the tab height
-                                    <img src="https://static1.gamerantimages.com/wordpress/wp-content/uploads/2021/04/pokemon-card-backs.jpg"/>
-
+                                    <img src="../img/PokemonBingo.png" id="bingoCardImage"/>
+                                    {renderBingoLink()}
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div className="column" id="bingoCards">
-                        <img src="../img/PokemonBingo.png"/>
+                        <img src="https://static1.gamerantimages.com/wordpress/wp-content/uploads/2021/04/pokemon-card-backs.jpg"/>
                     </div>
                 </div>
                 <div className="ui vertical divider">

@@ -5,9 +5,9 @@ import "../css/BingoCard.css";
 import CardRow from "../CardRow";
 
 
-const BingoCard = ({cards, user})=>{
-
-
+const BingoCard = (props)=>{
+    console.log(props)
+    let cards=props.bingoCard.cards;
 
     //creating blank array of length five
     let rowArray=[...Array(5)]
@@ -16,7 +16,6 @@ const BingoCard = ({cards, user})=>{
             <CardRow cards={cards.slice(i*5, 5*i+5)} />
         )
     })
-    console.log(user)
 
 
 

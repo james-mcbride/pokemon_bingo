@@ -11,10 +11,10 @@ import CreateBingoCard from "./CreateBingoCard";
 
 
 export default()=>{
-    const [cards, setCards] = useState([])
     const [user, setUser] = useState(null);
     const [groups, setGroups] = useState([])
     const [bingoCards, setBingoCards] = useState([])
+    const [selectedBingo, setSelectedBingo] = useState(null)
 
     useEffect(()=>{
         // pokemon.card.where({ q: 'set.id:base1' })
@@ -38,6 +38,7 @@ export default()=>{
 
 
     },[])
+
     const onLogin = (loggedInUser) =>{
         setUser(loggedInUser)
         //
@@ -58,6 +59,10 @@ export default()=>{
                 setBingoCards(response.data.bingoCards)
             })
     }
+
+    const onSelectBingoCard = (bingoCard)=>{
+        setSelectedBingo(bingoCard)
+    }
         return (
             <div className="container" style={{height: "100%"}}>
                 <BrowserRouter>
@@ -66,8 +71,8 @@ export default()=>{
                             {user===null ? <Redirect to="/login" /> : <Home setUser={onLogin}/>}
 
                         </Route>
-                        <Route exact path="/group/bingo">
-                            <BingoCard cards={cards} user={user}/>
+                        <Route exact path="/group/:id/bingo">
+                            <BingoCard bingoCard={selectedBingo} user={user}/>
                         </Route>
                         <Route exact path="/register">
                             {user!==null ? <Redirect to="/profile" /> : <Register setUser={onLogin}/>}
@@ -76,7 +81,7 @@ export default()=>{
                             {user!==null ? <Redirect to="/profile" /> : <Login setUser={onLogin}/>}
                         </Route>
                         <Route exact path="/profile">
-                            {user===null ? <Redirect to="/login" /> : <Profile setUser={onLogin} user={user} groups={groups} bingoCards={bingoCards}/>}
+                            {user===null ? <Redirect to="/login" /> : <Profile setUser={onLogin} user={user} groups={groups} bingoCards={bingoCards} onSelectBingoCard={onSelectBingoCard}/>}
                         </Route>
                         <Route exact path="/bingo/create">
                             {user===null ? <Redirect to="/login" /> : <CreateBingoCard groups={groups} user={user}/>}
