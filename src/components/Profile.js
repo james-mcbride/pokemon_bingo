@@ -1,48 +1,127 @@
 import React, {useEffect, useState} from "react";
 import {Link} from "react-router-dom";
 import "../css/Profile.css"
+import bingoImage from "../img/PokemonBingo.png"
+import axios from "axios";
+import { Button, Header, Image, Modal } from 'semantic-ui-react'
+
 
 const Profile = (props) =>{
-    console.log(props)
+    console.log(props);
     const [selectedBingo, setSelectedBingo] = useState(null)
+    const [bingoCards, setBingoCards] = useState([]);
+    const [open, setOpen] = useState(false)
+    const [pokemonCard, setPokemonCard]=useState(null)
 
 
 
     useEffect(()=>{
-        if (props.bingoCards.length>0) {
-            setSelectedBingo(props.bingoCards[0])
+        //will do a separate ajax call to get all bingo cards
+        let url="http://localhost:8090/profile/"+props.user.id+"/bingoCard"
+        axios.get(url)
+            .then(response=> {
+                console.log(response);
+                // setGroups(response.data.groups);
+                setBingoCards(response.data.bingoCards)
+            })
+    },[])
+
+
+    const renderedBingoCards = bingoCards.map((bingoCard,index)=>{
+        let tabIsActive="";
+        if (selectedBingo!=null) {
+            if (bingoCard.id === selectedBingo.id) {
+                tabIsActive = "active";
+            }
+        } else if (selectedBingo==null & bingoCards.length>0 && index===0){
+            tabIsActive="active"
         }
 
-    }, [])
-
-    const renderedBingoCards = props.bingoCards.map(bingoCard=>{
-        return (
-            <a className="item active">
-                {bingoCard.group.name}
-            </a>
-        )
+            return (
+                <a className={"item "+tabIsActive} onClick={()=>setSelectedBingo(bingoCard)}>
+                    {bingoCard.group.name}
+                </a>
+            )
     })
     const renderBingoLink = () =>{
-        props.onSelectBingoCard(selectedBingo)
         if (selectedBingo!==null){
             console.log("returning bingoCard link")
             return (
                 <Link to={"/group/"+selectedBingo.group.id+"/bingo"}>
-                    <div className="ui primary button">
+                    <div className="ui primary button" onClick={()=>props.onSelectBingoCard(selectedBingo)}>
                         View Bingo Card</div></Link>
             )
-        } else{
+        } else if (selectedBingo==null & bingoCards.length>0){
+            return (
+                <Link to={"/group/"+bingoCards[0].group.id+"/bingo"}>
+                    <div className="ui primary button" onClick={()=>props.onSelectBingoCard(bingoCards[0])}>
+                        View Bingo Card</div></Link>
+            )
+        }else{
             return (
                 <div></div>
             )
         }
     }
 
+    const newPokemonCard = () => {
+
+        axios.get(`http://localhost:8090/profile/${props.user.id}/draw`)
+            .then(response=> {
+                console.log(response)
+                console.log(response.data)
+                console.log(response.data.id)
+                // console.log(response.data.card.imageURL);
+
+                setPokemonCard(response.data.card.imageURL);
+            })
+    }
+
+
+    let modal = (
+        <Modal
+            onClose={() => setOpen(false)}
+            onOpen={() => setOpen(true)}
+            open={open}
+            trigger={<Button className="ui yellow button" onClick={()=>newPokemonCard()}>Draw Pokemon Card</Button>}
+        >
+            <Modal.Header>New Pokemon Card</Modal.Header>
+            <Modal.Content image>
+                <Image size='large' src={pokemonCard} wrapped />
+                {/*<Modal.Description>*/}
+                {/*    <Header>Default Profile Image</Header>*/}
+                {/*    <p>*/}
+                {/*        We've found the following gravatar image associated with your e-mail*/}
+                {/*        address.*/}
+                {/*    </p>*/}
+                {/*    <p>Is it okay to use this photo?</p>*/}
+                {/*</Modal.Description>*/}
+            </Modal.Content>
+            <Modal.Actions>
+                <Button color='black' onClick={() => setOpen(false)}>
+                    Nope
+                </Button>
+                <Button
+                    content="Yep, that's me"
+                    labelPosition='right'
+                    icon='checkmark'
+                    onClick={() => setOpen(false)}
+                    positive
+                />
+            </Modal.Actions>
+        </Modal>
+    )
+
     return (
         <div id="homeContainer">
+
             <h2 className="ui header">
                 <img src="https://s3.amazonaws.com/alumni.codeup.com/JamesMcBride.jpg" className="ui circular image" />
                 {props.user.firstName + " "+ props.user.lastName}
+                {modal}
+                <Link to="/group/create">
+                    <div className="ui right floated primary button">
+                        Create Group</div></Link>
                 <Link to="/bingo/create">
                     <div className="ui right floated primary button">
                         Create Bingo Card</div></Link>
@@ -60,7 +139,7 @@ const Profile = (props) =>{
                             </div>
                             <div className="twelve wide stretched column">
                                 <div className="ui segment">
-                                    <img src="../img/PokemonBingo.png" id="bingoCardImage"/>
+                                    <img src={bingoImage} id="bingoCardImage"/>
                                     {renderBingoLink()}
                                 </div>
                             </div>

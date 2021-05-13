@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react';
+import cardBack from "../img/pokemon-card-back-2.png"
 
 const PokemonCard = ({card}) => {
     console.log(card)
@@ -32,12 +33,13 @@ const PokemonCard = ({card}) => {
             <a className="yellow card pokemonCard" style={{width: cardWidth}} >
                 <div className="flip-card-inner " >
                     <div className="image flip-card-front">
-                        <img className="ui wireframe image" src="../img/pokemon-card-back-2.png"/>
+                        <img className="ui wireframe image" src={cardBack} />
                     </div>
                 </div>
             </a>
         )
     } else {
+        console.log(card.card.imageURL)
         return (
             <a className="yellow card pokemonCard flip-card" style={{width: cardWidth}}>
                 <div
@@ -47,10 +49,10 @@ const PokemonCard = ({card}) => {
                     // onMouseLeave={()=>setFlipped("")}
                 >
                     <div className="image flip-card-front">
-                        <img className={"ui wireframe image " +backOfCard} src="../img/pokemon-card-back-2.png"/>
+                        <img className={"ui wireframe image " +backOfCard} src={cardBack} alt="cardBack"/>
                     </div>
                     <div className="image flip-card-back">
-                        <img className="ui wireframe image" src={card.imageURL}/>
+                        <img className="ui wireframe image" src={card.card.imageURL}/>
                     </div>
                 </div>
             </a>

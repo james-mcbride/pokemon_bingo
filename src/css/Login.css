@@ -20,10 +20,30 @@
     background: whitesmoke;
     opacity: .95;
     border-radius: 50px;
+    max-width: 50%;
 
 }
 .container{
     height: 100%;
     background: url(https://wallpapercave.com/wp/wp2860892.jpg);
     background-size: cover;
+}
+
+#groupMemberList{
+    white-space: nowrap;
+    overflow: scroll;
+    width:100%;
+}
+
+#groupMemberList::-webkit-scrollbar {
+    display: none;
+}
+
+#groupMembersSelectList{
+    visibility: hidden;
+    height:0;
+}
+
+.groupMemberOption{
+    height:0;
 }

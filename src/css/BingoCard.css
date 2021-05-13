@@ -83,3 +83,10 @@
     position:absolute;
     top:0;
 }
+
+#bingoGroupInfo{
+    width: fit-content;
+    margin-left: auto;
+    text-align: center;
+    margin-right: auto;
+}
