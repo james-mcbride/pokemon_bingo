@@ -9,11 +9,14 @@ import Home from "./Home";
 import Profile from "./Profile";
 import CreateBingoCard from "./CreateBingoCard";
 import CreateGroup from "./CreateGroup";
+import UserCards from "./UserCards";
 
 
 export default()=>{
     const [user, setUser] = useState(null);
     const [selectedBingo, setSelectedBingo] = useState(null)
+    const [userCards, setUserCards]= useState(null);
+
 
     useEffect(()=>{
 
@@ -30,16 +33,6 @@ export default()=>{
         //                .then(response=>console.log(response))
         //         }
         //     });
-
-
-
-
-    },[])
-
-    const onLogin = (loggedInUser) =>{
-        setUser(loggedInUser)
-        //
-        // //will do ajax call to internal api to get all users groups.
         // let url="http://localhost:8090/profile/"+loggedInUser.id+"/groups"
         // axios.get(url)
         //     .then(response=> {
@@ -48,6 +41,28 @@ export default()=>{
         //     })
 
 
+
+
+    },[])
+
+    const onLogin = (loggedInUser) =>{
+        setUser(loggedInUser)
+        axios.get(`http://localhost:8090/profile/${loggedInUser.id}/draw?draw=no`)
+            .then(response=> {
+                onUpdateCards(response.data.cards);
+            })
+        //
+        // //will do ajax call to internal api to get all users groups.
+        // let url="http://localhost:8090/profile/"+loggedInUser.id+"/groups"
+        // axios.get(url)
+        //     .then(response=> {
+        //         console.log(response);
+        //         setGroups(response.data)
+        //     })
+    }
+
+    const onUpdateCards= (cards) =>{
+        setUserCards(cards);
     }
 
     const onSelectBingoCard = (bingoCard)=>{
@@ -67,10 +82,13 @@ export default()=>{
                             {user!==null ? <Redirect to="/profile" /> : <Register setUser={onLogin}/>}
                         </Route>
                         <Route exact path="/login">
-                            {user!==null ? <Redirect to="/profile" /> : <Login setUser={onLogin}/>}
+                            {user!==null ? <Redirect to="/profile" /> : <Login setUser={onLogin}/> }
                         </Route>
                         <Route exact path="/profile">
-                            {user===null ? <Redirect to="/login" /> : <Profile setUser={onLogin} user={user}  onSelectBingoCard={onSelectBingoCard}/>}
+                            {user===null ? <Redirect to="/login" /> : <Profile setUser={onLogin} user={user}  onSelectBingoCard={onSelectBingoCard} onUpdateCards={onUpdateCards}/>}
+                        </Route>
+                        <Route exact path="/profile/cards">
+                            {user===null ? <Redirect to="/login" /> : <UserCards cards={userCards} />}
                         </Route>
                         <Route exact path="/bingo/create">
                             {user===null ? <Redirect to="/login" /> : <CreateBingoCard user={user} onSelectBingoCard={onSelectBingoCard}/>}
@@ -78,6 +96,7 @@ export default()=>{
                         <Route exact path="/group/create">
                             {user===null ? <Redirect to="/login" /> : <CreateGroup user={user} onSelectBingoCard={onSelectBingoCard} />}
                         </Route>
+
                     </div>
                 </BrowserRouter>
             </div>

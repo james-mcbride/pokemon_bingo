@@ -1,5 +1,5 @@
 import React from 'react';
-import PokemonCard from "./components/PokemonCard";
+import PokemonCard from "./PokemonCard";
 
 const CardRow = ({cards})=>{
     let renderedCards=cards.map(card=>{

@@ -90,3 +90,14 @@
     text-align: center;
     margin-right: auto;
 }
+
+.cardCounter{
+    position: absolute;
+    bottom: 2px;
+    left: 30%;
+    background: white;
+    color: black;
+    width: 40%;
+    opacity: .7;
+    border-radius: 5px;
+}

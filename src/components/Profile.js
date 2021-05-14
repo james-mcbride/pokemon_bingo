@@ -49,7 +49,7 @@ const Profile = (props) =>{
             return (
                 <Link to={"/group/"+selectedBingo.group.id+"/bingo"}>
                     <div className="ui primary button" onClick={()=>props.onSelectBingoCard(selectedBingo)}>
-                        View Bingo Card</div></Link>
+                        View {selectedBingo.group.name}'s Bingo Card</div></Link>
             )
         } else if (selectedBingo==null & bingoCards.length>0){
             return (
@@ -66,14 +66,14 @@ const Profile = (props) =>{
 
     const newPokemonCard = () => {
 
-        axios.get(`http://localhost:8090/profile/${props.user.id}/draw`)
+        axios.get(`http://localhost:8090/profile/${props.user.id}/draw?draw=yes`)
             .then(response=> {
                 console.log(response)
                 console.log(response.data)
-                console.log(response.data.id)
                 // console.log(response.data.card.imageURL);
-
-                setPokemonCard(response.data.card.imageURL);
+                console.log(response.data[response.data.length-1])
+                setPokemonCard(response.data.cards[response.data.cards.length-1].card.imageURL);
+                props.onUpdateCards(response.data.cards);
             })
     }
 
@@ -147,6 +147,9 @@ const Profile = (props) =>{
                     </div>
                     <div className="column" id="bingoCards">
                         <img src="https://static1.gamerantimages.com/wordpress/wp-content/uploads/2021/04/pokemon-card-backs.jpg"/>
+                        <Link to="/profile/cards">
+                            <div className="ui primary button">
+                                Your Card Collection</div></Link>
                     </div>
                 </div>
                 <div className="ui vertical divider">

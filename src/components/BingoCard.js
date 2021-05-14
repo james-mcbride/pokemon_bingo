@@ -2,7 +2,7 @@ import React, {useEffect} from 'react';
 
 import PokemonCard from './PokemonCard';
 import "../css/BingoCard.css";
-import CardRow from "../CardRow";
+import CardRow from "./CardRow";
 import {Link} from "react-router-dom";
 
 

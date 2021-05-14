@@ -2,7 +2,6 @@ import React, {useEffect, useState} from 'react';
 import cardBack from "../img/pokemon-card-back-2.png"
 
 const PokemonCard = ({card}) => {
-    console.log(card)
 
     const [flipped, setFlipped] = useState("")
     const [backOfCard, setBackOfCard]=useState("")
@@ -12,6 +11,10 @@ const PokemonCard = ({card}) => {
     useEffect(()=>{
         let height=window.innerWidth;
         setCardWidth(600*height/(5*1000)+"px")
+        if (card.counter){
+            cardClick()
+        }
+
     },[])
 
     let cardClick=()=>{
@@ -39,7 +42,6 @@ const PokemonCard = ({card}) => {
             </a>
         )
     } else {
-        console.log(card.card.imageURL)
         return (
             <a className="yellow card pokemonCard flip-card" style={{width: cardWidth}}>
                 <div
@@ -53,6 +55,7 @@ const PokemonCard = ({card}) => {
                     </div>
                     <div className="image flip-card-back">
                         <img className="ui wireframe image" src={card.card.imageURL}/>
+                        {card.counter>1 ? <div className="cardCounter">{card.counter}</div> : ""}
                     </div>
                 </div>
             </a>
