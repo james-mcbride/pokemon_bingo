@@ -87,7 +87,9 @@ const Profile = (props) =>{
         >
             <Modal.Header>New Pokemon Card</Modal.Header>
             <Modal.Content image>
-                <Image size='large' src={pokemonCard} wrapped />
+                <Image size='large' src={pokemonCard} style={{textAlign: "center",marginLeft: "auto", marginRight: "auto",height: "500px", objectFit: "contain"}} />
+                {/*<div className="image content"><img src={pokemonCard} className="ui large image" style="height: 500px;"/></div>*/}
+
                 {/*<Modal.Description>*/}
                 {/*    <Header>Default Profile Image</Header>*/}
                 {/*    <p>*/}
@@ -97,17 +99,10 @@ const Profile = (props) =>{
                 {/*    <p>Is it okay to use this photo?</p>*/}
                 {/*</Modal.Description>*/}
             </Modal.Content>
-            <Modal.Actions>
-                <Button color='black' onClick={() => setOpen(false)}>
-                    Nope
+            <Modal.Actions style={{textAlign: "center"}}>
+                <Button color='black'  onClick={() => setOpen(false)}>
+                    Return Home
                 </Button>
-                <Button
-                    content="Yep, that's me"
-                    labelPosition='right'
-                    icon='checkmark'
-                    onClick={() => setOpen(false)}
-                    positive
-                />
             </Modal.Actions>
         </Modal>
     )

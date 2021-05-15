@@ -47,12 +47,12 @@ const UserCards = (props)=>{
     let rowArray = [...Array(30)]
     let renderedRows = rowArray.map((row, i) => {
         return (
-            <CardRow cards={cards.slice(i * 5, 5 * i + 5)}/>
+            <CardRow cards={cards.slice(i * 5, 5 * i + 5)} style={{height:"3%"}}/>
         )
     })
 
     return (
-        <div className="bingoCard">
+        <div className="bingoCard" style={{height:"1000%"}}>
             {renderedRows}
         </div>
     )
