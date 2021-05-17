@@ -9,18 +9,16 @@ const Register = (props) =>{
 
 
     const onRegister = () =>{
-        axios.get("http://localhost:8090/register", {
-            params: {
+            axios.post("http://localhost:8090/register", {
                 username: username,
                 password: password,
                 firstName: firstName,
                 lastName: lastName
-            }
-        })
-            .then(response=> {
-                console.log(response);
-                props.setUser(response.data)
             })
+                .then(response=> {
+                    console.log(response);
+                    props.setUser(response.data)
+                })
     }
     return (
         <div id="flexContainer">
