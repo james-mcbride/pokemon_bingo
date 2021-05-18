@@ -52,12 +52,15 @@ const Login = (props) =>{
 
 
     const onGroupSubmit = (event) =>{
-        let groupMembersList=document.getElementById("groupMembersSelectList").value;
+        let groupMembersList=addedUsers.map(user=>user.id);
+        console.log(groupMembersList)
+
+        console.log(groupMembersList)
         axios.get("http://localhost:8090/groups/create", {
             params: {
                 name: groupName,
                 owner: props.user.id,
-                groupMembersList: groupMembersList
+                groupMembersList: addedUsers.map(user=>user.id)
             }
         })
             .then(response=> {
@@ -77,9 +80,12 @@ const Login = (props) =>{
     const renderedAddedMembers = addedUsers.map(user=>{
         return (
             <div className="item">
-                <img className="ui avatar image" src="https://s3.amazonaws.com/alumni.codeup.com/JamesMcBride.jpg"/>
-                <div className="content">
-                    <div className="header">{user.firstName+" "+user.lastName}</div>
+                <div className="content" style={{float: "right"}}>
+                    <div className="header">
+                        <div style={{width:40, height:35, overflow: "hidden", borderRadius: "50%", margin: "0 5px", float: "left"}}>
+                            <img src={user.profilePicture} style={{objectFit:"cover", width: "100%"}}/>
+                        </div>
+                        {user.firstName+" "+user.lastName}</div>
                     {user.username}
                 </div>
             </div>
@@ -96,7 +102,9 @@ const Login = (props) =>{
     const renderGroupMembers = searchedUsers.map(user=>{
         return (
         <div className="item">
-            <img className="ui avatar image" src="https://s3.amazonaws.com/alumni.codeup.com/JamesMcBride.jpg" />
+            <div style={{width:40, height:35, overflow: "hidden", borderRadius: "50%", margin: "0 5px", float: "left"}}>
+                <img src={user.profilePicture} style={{objectFit:"cover", width: "100%"}}/>
+            </div>
                 <div className="content">
                     <div className="header">{user.firstName+" "+user.lastName}</div>
                     <div className="ui right floated primary button" onClick={()=>onAddGroupMember(user)}>

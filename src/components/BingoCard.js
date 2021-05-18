@@ -85,10 +85,14 @@ const BingoCard = (props)=>{
             if (props.bingoCard!=null){
                 let groupMembers = bingoPlayers.map(groupMember=>{
                     return (
-                        <div className="item" style={groupMember.username===bingoCardOwner ? {background: "green",borderRadius: "5px", padding: "5px",opacity: .8} : {}} onClick={()=>setBingoCardOwner(groupMember.username)}>
-                            <img className="ui avatar image" src="https://s3.amazonaws.com/alumni.codeup.com/JamesMcBride.jpg"/>
+                        <div className="item" style={groupMember.username===bingoCardOwner ? {background: "green",borderRadius: "5px", padding: "5px",opacity: .8, display: "flex",width:"fit-content", float: "left"} : {display:"flex", width: "fit-content", float: "left"}} onClick={()=>setBingoCardOwner(groupMember.username)}>
                             <div className="content">
-                                <div className="header">{groupMember.firstName+" "+groupMember.lastName}</div>
+
+                                <div className="header">
+                                    <div style={{width:40, height:35, overflow: "hidden", borderRadius: "50%", margin: "0 5px", float: "left"}}>
+                                        <img src={groupMember.profilePicture} style={{objectFit:"cover", width: "100%"}}/>
+                                    </div>
+                                    {groupMember.firstName+" "+groupMember.lastName}</div>
                                 {groupMember.bingoMatches} {groupMember.bingoMatches===1 ? "match" : "matches"}
                             </div>
                         </div>

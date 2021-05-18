@@ -138,7 +138,9 @@ const Profile = (props) =>{
         <div id="homeContainer">
 
             <h2 className="ui header">
-                <img src="https://s3.amazonaws.com/alumni.codeup.com/JamesMcBride.jpg" className="ui circular image" />
+                <div style={{width:62, height:50, overflow: "hidden", borderRadius: "50%", margin: "0 auto", float: "left"}}>
+                    <img src={props.user.profilePicture} style={{objectFit:"cover", width: "100%"}}/>
+                </div>
                 {props.user.firstName + " "+ props.user.lastName}
                 {modal}
                 <Link to="/group/create">
