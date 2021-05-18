@@ -118,7 +118,7 @@ const Login = (props) =>{
                     </div>
                     <form className="ui form pokemonForm" id="pokemonGroupForm">
                         <div className="field">
-                            <label>Username</label>
+                            <label>Group Name</label>
                             <input type="text" name="name" placeholder="Enter Group Name..." value={groupName}
                                    onChange={event => setGroupName(event.target.value)}/>
                         </div>

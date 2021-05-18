@@ -43,7 +43,8 @@ const Login = (props) =>{
                     </div>
 
                     <button className="ui button" type="button" onClick={() => onLogin()}>Submit</button>
-                    <div style={{float: "right", color: "red"}}>{errorMessage}</div>
+                    <a href="/register"><button className="ui button" type="button" style={{float: "Right", background: "gold"}}>Not a user? Register!</button></a>
+                    <div style={{ color: "red"}}>{errorMessage}</div>
                 </form>
 
             </div>

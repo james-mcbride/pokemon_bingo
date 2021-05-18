@@ -35,8 +35,8 @@ const CreateBingoCard = (props) =>{
         })
             .then(response=> {
                 console.log(response);
-                setRedirect(true);
                 props.onSelectBingoCard(response.data)
+                setRedirect(true);
             })
     }
 

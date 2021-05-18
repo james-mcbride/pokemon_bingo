@@ -40,9 +40,11 @@ const Profile = (props) =>{
             return (
                 <a className={"item "+tabIsActive} onClick={()=>setSelectedBingo(bingoCard)}>
                     {bingoCard.group.name}
+                    {bingoCard.notification? <i style={{color: "red",fontSize: "large"}} className="exclamation circle icon"></i> : ""}
                 </a>
             )
     })
+
     const renderBingoLink = () =>{
         if (selectedBingo!==null){
             console.log("returning bingoCard link")
@@ -55,7 +57,7 @@ const Profile = (props) =>{
             return (
                 <Link to={"/group/"+bingoCards[0].group.id+"/bingo"}>
                     <div className="ui primary button" onClick={()=>props.onSelectBingoCard(bingoCards[0])}>
-                        View Bingo Card</div></Link>
+                        View {bingoCards[0].group.name}'s Bingo Card</div></Link>
             )
         }else{
             return (
@@ -68,12 +70,37 @@ const Profile = (props) =>{
 
         axios.get(`http://localhost:8090/profile/${props.user.id}/draw?draw=yes`)
             .then(response=> {
-                console.log(response)
                 console.log(response.data)
-                // console.log(response.data.card.imageURL);
-                console.log(response.data[response.data.length-1])
                 setPokemonCard(response.data.cards[response.data.cards.length-1].card.imageURL);
                 props.onUpdateCards(response.data.cards);
+
+                //after drawing new pokemon card, all bingo cards that have a match ar returned, will update the bingo cards on screen with these matches.
+                if (response.data.bingoMatches && response.data.bingoMatches.length>0){
+                    console.log("we have a match")
+                    let updatedBingoCards=response.data.bingoMatches;
+                    let updatedBingoCardsObj={}
+                    for (let bingoCard of updatedBingoCards){
+                        bingoCard.notification=true;
+                        updatedBingoCardsObj[bingoCard.id]=bingoCard;
+                    }
+                    console.log(updatedBingoCardsObj)
+
+                    //making a copy of state bingoCards
+                    let currentBingoCards=[...bingoCards];
+
+                    //loop through bingo card array from copy above, and update indexes that have a match.
+                    let updatedStateBingoCards=currentBingoCards.map(bingoCard=>{
+                        if (updatedBingoCardsObj[bingoCard.id]){
+                            console.log("we have found our match and will update now")
+                            return updatedBingoCardsObj[bingoCard.id]
+                        } else{
+                            return bingoCard
+                        }
+
+                    })
+                    console.log(updatedStateBingoCards)
+                    setBingoCards(updatedStateBingoCards)
+                }
             })
     }
 
@@ -122,7 +149,7 @@ const Profile = (props) =>{
                         Create Bingo Card</div></Link>
 
             </h2>
-            <div className="ui segment" id="profileMenu">
+            <div className="ui segment" id="profileMenu" style={{background: "white", opacity: ".9"}}>
                 <div className="ui two column very relaxed grid">
                     <div className="column" id="cardCollection">
                         <div className="ui grid">

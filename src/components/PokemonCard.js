@@ -1,8 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import cardBack from "../img/pokemon-card-back-2.png"
 
-const PokemonCard = ({card}) => {
-
+const PokemonCard = ({card, owner}) => {
     const [flipped, setFlipped] = useState("")
     const [backOfCard, setBackOfCard]=useState("")
     const [flippedStatus, setFlippedStatus] = useState(false)
@@ -11,11 +10,20 @@ const PokemonCard = ({card}) => {
     useEffect(()=>{
         let height=window.innerWidth;
         setCardWidth(600*height/(5*1000)+"px")
-        if (card.counter){
+        console.log(card.groupMembers)
+        if ((card.counter) || (card.groupMembers && card.groupMembers[owner]!==undefined && flippedStatus===false)){
             cardClick()
         }
 
     },[])
+
+    useEffect(()=>{
+        if ((card.counter) || (card.groupMembers && card.groupMembers[owner]!==undefined && flippedStatus===false)){
+            cardClick()
+        }else if ((card.groupMembers && !card.groupMembers[owner] && flippedStatus===true)){
+            cardClick()
+        }
+    }, [owner])
 
     let cardClick=()=>{
         if (!flippedStatus){
@@ -30,8 +38,9 @@ const PokemonCard = ({card}) => {
     }
 
 
+    console.log(card)
+    if (card===null||card===undefined){
 
-    if (card===null){
         return (
             <a className="yellow card pokemonCard" style={{width: cardWidth}} >
                 <div className="flip-card-inner " >
@@ -41,7 +50,26 @@ const PokemonCard = ({card}) => {
                 </div>
             </a>
         )
-    } else {
+    } else if(card.pokedexNumber){
+        return (
+            <a className="yellow card pokemonCard flip-card" style={{width: cardWidth}}>
+                <div
+                    className={"flip-card-inner "+flipped}
+                    onClick={()=>cardClick()}
+                    //  onMouseEnter={()=>setFlipped("flipCardOver")}
+                    // onMouseLeave={()=>setFlipped("")}
+                >
+                    <div className="image flip-card-front">
+                        <img className={"ui wireframe image " +backOfCard} src={cardBack} alt="cardBack"/>
+                    </div>
+                    <div className="image flip-card-back">
+                        <img className="ui wireframe image" src={card.imageURL}/>
+                        {card.groupMembers[owner]!=undefined && card.groupMembers[owner]>1 ? <div className="cardCounter">{card.groupMembers[owner]}</div> : ""}
+                    </div>
+                </div>
+            </a>
+        )
+    }else {
         return (
             <a className="yellow card pokemonCard flip-card" style={{width: cardWidth}}>
                 <div
