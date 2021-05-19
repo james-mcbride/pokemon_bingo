@@ -5,7 +5,7 @@
 
 #homeContainer{
     height: 100%;
-    background: url(https://wallpaperaccess.com/full/3062914.jpg);
+    background: url(https://cdn.wallpapersafari.com/34/89/82MW34.jpg);
     background-size: cover;
 
 }
@@ -28,3 +28,31 @@
     height:70%;
     object-fit: contain;
 }
+#profileUserDetails{
+    display: flex;
+}
+#profileImage{
+    width: 50%;
+    padding-top:10px;
+}
+#drawCards{
+    width: 50%;
+    text-align: center
+}
+
+#remainingCards{
+    display:flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#remainingCardsCounter{
+    width: fit-content;
+    margin: 0 auto;
+    padding: 10px;
+    background: gold;
+    border: 3px solid blue;
+    border-radius: 10px;
+    color: blue;
+}
+

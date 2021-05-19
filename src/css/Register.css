@@ -21,8 +21,7 @@
     border-radius: 50px;
 
 }
-.container{
-    height: 100%;
+#flexContainer{
     background: url(https://images6.alphacoders.com/893/thumb-1920-893634.png);
     background-size: cover;
 }

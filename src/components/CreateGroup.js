@@ -56,12 +56,10 @@ const Login = (props) =>{
         console.log(groupMembersList)
 
         console.log(groupMembersList)
-        axios.get("http://localhost:8090/groups/create", {
-            params: {
+        axios.post("http://localhost:8090/groups/create", {
                 name: groupName,
                 owner: props.user.id,
                 groupMembersList: addedUsers.map(user=>user.id)
-            }
         })
             .then(response=> {
                 console.log(response);

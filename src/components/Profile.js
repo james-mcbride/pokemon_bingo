@@ -2,6 +2,7 @@ import React, {useEffect, useState} from "react";
 import {Link} from "react-router-dom";
 import "../css/Profile.css"
 import bingoImage from "../img/PokemonBingo.png"
+import drawsRemaining from "../img/pokemon_draws_remaining.png"
 import axios from "axios";
 import { Button, Header, Image, Modal } from 'semantic-ui-react'
 
@@ -110,7 +111,7 @@ const Profile = (props) =>{
             onClose={() => setOpen(false)}
             onOpen={() => setOpen(true)}
             open={open}
-            trigger={<Button className="ui yellow button" onClick={()=>newPokemonCard()}>Draw Pokemon Card</Button>}
+            trigger={<Button className="ui yellow button" style={{color: "blue"}} onClick={()=>newPokemonCard()}>Draw Pokemon Card</Button>}
         >
             <Modal.Header>New Pokemon Card</Modal.Header>
             <Modal.Content image>
@@ -136,21 +137,35 @@ const Profile = (props) =>{
 
     return (
         <div id="homeContainer">
-
-            <h2 className="ui header">
-                <div style={{width:62, height:50, overflow: "hidden", borderRadius: "50%", margin: "0 auto", float: "left"}}>
-                    <img src={props.user.profilePicture} style={{objectFit:"cover", width: "100%"}}/>
+            <div id="profileUserDetails">
+                <div id="profileImage">
+                    <div style={{
+                        width: 150,
+                        height: 130,
+                        overflow: "hidden",
+                        borderRadius: "50%",
+                        margin: "0 auto",
+                        textAlign:"center",
+                        border: "3px solid gold"
+                    }}>
+                        <img src={props.user.profilePicture} style={{objectFit: "cover", width: "100%"}}/>
+                    </div>
+                    <h3 style={{textAlign: "center", marginTop: 10}}>{props.user.firstName + " " + props.user.lastName}</h3>
                 </div>
-                {props.user.firstName + " "+ props.user.lastName}
-                {modal}
-                <Link to="/group/create">
-                    <div className="ui right floated primary button">
-                        Create Group</div></Link>
-                <Link to="/bingo/create">
-                    <div className="ui right floated primary button">
-                        Create Bingo Card</div></Link>
+                 <div id="drawCards">
+                     <div id="remainingCards">
+                         <div>
+                             <h1 id="remainingCardsCounter">{5}</h1>
+                             <div style={{padding:10}}>
+                                 <img src={drawsRemaining} style={{width: 200}} />
+                             </div>
+                             {modal}
+                         </div>
 
-            </h2>
+                     </div>
+
+                 </div>
+            </div>
             <div className="ui segment" id="profileMenu" style={{background: "white", opacity: ".9"}}>
                 <div className="ui two column very relaxed grid">
                     <div className="column" id="cardCollection">

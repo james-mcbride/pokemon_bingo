@@ -1,5 +1,5 @@
 import React, {Component, useState, useEffect} from 'react';
-import {BrowserRouter, Route, Redirect} from 'react-router-dom'
+import {BrowserRouter, Route, Redirect, Link} from 'react-router-dom'
 import BingoCard from "./BingoCard";
 import pokemon from "pokemontcgsdk";
 import axios from "axios";
@@ -72,6 +72,18 @@ export default()=>{
             <div className="container" style={{height: "100%"}}>
                 <BrowserRouter>
                     <div id="routerContainer">
+                        <div className="ui menu green" style={{background: "green", marginBottom: 0}}>
+                            {user!=null ? <Link to="/profile"><a className="item">Home</a></Link> : ""}
+                            {user!=null ? <Link to="/profile/cards"><a className="item">View cards</a></Link> : ""}
+                            {user!=null ? <Link to="/group/create"><a className="item">Create Group</a></Link> : ""}
+
+                            <div className="right menu">
+                                {user!=null ? "" : <Link to="/register"><a className="item">Sign up</a></Link>}
+                                {user!=null ? "" : <Link to="/login"><a className="item">Log in</a></Link>}
+                                {user!=null ? <a className="item" href="/login">Logout</a> :"" }
+
+                            </div>
+                        </div>
                         <Route exact path="/">
                             {user===null ? <Redirect to="/login" /> : <Home setUser={onLogin}/>}
                         </Route>
