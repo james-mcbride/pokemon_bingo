@@ -46,19 +46,81 @@ const Profile = (props) =>{
             )
     })
 
+    const sortBingoCardGroupMembers = (bingoCard) =>{
+        //create an object with groupMembers in it, to track pokemon card matches later on.
+        let groupMembers = [bingoCard.group.groupMembers];
+        let groupMemberObj = {};
+
+        //create an object with each bingo card in it.
+        let bingoCardObj = {}
+        for (let card of bingoCard.cards) {
+            card.card.groupMembers = {};
+            bingoCardObj[card.card.pokedexNumber] = card.card;
+        }
+
+        console.log(bingoCardObj);
+
+
+        //create an object with each groupmember in it.
+        for (let groupMember of groupMembers) {
+            groupMember.member.bingoMatches = 0;
+            groupMemberObj[groupMember.id] = groupMember.member;
+
+            //will check groupMember cards to see how many bingo matches they have.
+            let groupMemberCards = props.bingoCard.groupMemberMatches[groupMember.id];
+            console.log(groupMemberCards)
+            for (let cardId of groupMemberCards) {
+                if (bingoCardObj[cardId]) {
+                    if (bingoCardObj[cardId].groupMembers && bingoCardObj[cardId].groupMembers[groupMember.member.username] > 0) {
+                        bingoCardObj[cardId].groupMembers[groupMember.member.username]++;
+                    } else {
+                        //will update group member matches
+                        groupMemberObj[groupMember.id].bingoMatches++;
+                        bingoCardObj[cardId].groupMembers[groupMember.member.username] = 1;
+                    }
+                }
+            }
+
+        }
+
+        //will sort group members by number of pokemon card matches
+        let updatedGroupMembers = Object.values(groupMemberObj);
+        return updatedGroupMembers.sort(function (a, b) {
+            return b.bingoMatches - a.bingoMatches
+        })
+
+    }
+
     const renderBingoLink = () =>{
-        if (selectedBingo!==null){
-            console.log("returning bingoCard link")
+        if (bingoCards.length>0){
+            let bingoCard;
+            if (selectedBingo !== null) {
+                bingoCard=selectedBingo;
+            } else if (selectedBingo == null & bingoCards.length > 0) {
+                bingoCard=bingoCards[0]
+            }
+            let sortedGroupMembers=sortBingoCardGroupMembers(bingoCard);
+            let displayGroupMembers=sortedGroupMembers.map(groupMember=>{
+                return (
+                    <div className="item" style={groupMember.username===props.user.username ? {background: "green",borderRadius: "5px", padding: "5px",opacity: .8, display: "flex",width:"fit-content", float: "left"} : {display:"flex", width: "fit-content", float: "left"}} >
+                        <div className="content">
+
+                            <div className="header">
+                                <div style={{width:40, height:35, overflow: "hidden", borderRadius: "50%", margin: "0 5px", float: "left"}}>
+                                    <img src={groupMember.profilePicture} style={{objectFit:"cover", width: "100%"}}/>
+                                </div>
+                                {groupMember.firstName+" "+groupMember.lastName}</div>
+                            {groupMember.bingoMatches} {groupMember.bingoMatches===1 ? "match" : "matches"}
+                        </div>
+                    </div>
+                )
+            })
             return (
-                <Link to={"/group/"+selectedBingo.group.id+"/bingo"}>
-                    <div className="ui primary button" onClick={()=>props.onSelectBingoCard(selectedBingo)}>
-                        View {selectedBingo.group.name}'s Bingo Card</div></Link>
-            )
-        } else if (selectedBingo==null & bingoCards.length>0){
-            return (
-                <Link to={"/group/"+bingoCards[0].group.id+"/bingo"}>
-                    <div className="ui primary button" onClick={()=>props.onSelectBingoCard(bingoCards[0])}>
-                        View {bingoCards[0].group.name}'s Bingo Card</div></Link>
+                <Link to={"/group/" + bingoCard.group.id + "/bingo"}>
+                    <div className="ui primary button" onClick={() => props.onSelectBingoCard(bingoCard)}>
+                        View {bingoCard.group.name}'s Bingo Card
+                    </div>
+                </Link>
             )
         }else{
             return (
@@ -166,33 +228,48 @@ const Profile = (props) =>{
 
                  </div>
             </div>
-            <div className="ui segment" id="profileMenu" style={{background: "white", opacity: ".9"}}>
-                <div className="ui two column very relaxed grid">
-                    <div className="column" id="cardCollection">
-                        <div className="ui grid">
-                            <div className="four wide column">
-                                <div className="ui vertical fluid tabular menu">
-                                    {renderedBingoCards}
+            <div id="userCardStats">
+                <div className="ui statistics" style={{alignItems: "center"}}>
+                    <div className="statistic">
+                        <div className="value">
+                            22
+                        </div>
+                        <div className="label">
+                            Cards Drawn
+                        </div>
+                    </div>
+                    <div className="statistics">
+                        <Link to="/profile/cards">
+                            <button className="ui red button">View<br/> Collection!</button>
+                        </Link>
+                    </div>
+                    <div className="statistic">
+                        <div className="value">
+                            <img src="https://cdn.pixabay.com/photo/2019/11/27/14/06/pokemon-4657023_1280.png" className="ui circular inline image" />
+                                42
+                        </div>
+                        <div className="label">
+                            Unique Pokemon
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div className="profilePaths" id="cardCollection">
+                <h2 style={{textAlign: "center"}}>Your Bingo Cards</h2>
+                <div className="ui grid">
+                    <div className="four wide column">
+                        <div className="ui vertical fluid tabular menu">
+                            {renderedBingoCards}
 
-                                </div>
-                            </div>
-                            <div className="twelve wide stretched column">
-                                <div className="ui segment">
-                                    <img src={bingoImage} id="bingoCardImage"/>
-                                    {renderBingoLink()}
-                                </div>
+                        </div>
+                    </div>
+                    <div className="twelve wide stretched column">
+                        <div className="ui segment">
+                            <div className="ui ordered horizontal list" id="groupMemberList">
+                                {renderBingoLink()}
                             </div>
                         </div>
                     </div>
-                    <div className="column" id="bingoCards">
-                        <img src="https://static1.gamerantimages.com/wordpress/wp-content/uploads/2021/04/pokemon-card-backs.jpg"/>
-                        <Link to="/profile/cards">
-                            <div className="ui primary button">
-                                Your Card Collection</div></Link>
-                    </div>
-                </div>
-                <div className="ui vertical divider">
-                    and
                 </div>
             </div>
         </div>

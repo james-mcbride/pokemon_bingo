@@ -56,3 +56,32 @@
     color: blue;
 }
 
+@media screen and (min-width:576px) {
+    .profilePaths{
+        width: 100%;
+        float:left
+    }
+
+}
+
+
+
+/* Large devices (desktops, 992px and up) */
+@media screen and (min-width:768px) {
+    .profilePaths{
+        width: 50%;
+        float:left
+    }
+}
+
+#userCardStats{
+    width: fit-content;
+    margin: 0 auto;
+    background: #00bcd4;
+    padding: 10px;
+    border-radius: 10px;
+    opacity: 0.9;
+
+}
+
+
