@@ -8,8 +8,13 @@ const PokemonCard = ({card, owner}) => {
     const [cardWidth, setCardWidth] = useState("100px");
 
     useEffect(()=>{
-        let height=window.innerWidth;
-        setCardWidth(600*height/(5*1000)+"px")
+        let width=window.innerWidth;
+        let height=window.innerHeight;
+        if (width>=height) {
+            setCardWidth(600 * width / (5 * 1000) + "px")
+        } else{
+            setCardWidth( width / 6 + "px")
+        }
         console.log(card.groupMembers)
         if ((card.counter) || (card.groupMembers && card.groupMembers[owner]!==undefined && flippedStatus===false)){
             cardClick()

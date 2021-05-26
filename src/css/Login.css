@@ -8,10 +8,12 @@
     width:100%
 }
 #flexContainer{
-    height:100%;
+    height:calc(100% - 42px);
     display:flex;
     justify-content: center;
     align-items: center;
+    background: url(https://wallpapercave.com/wp/wp2860892.jpg);
+    background-size: cover;
 }
 #formDiv{
     height:auto;

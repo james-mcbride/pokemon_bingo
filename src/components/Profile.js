@@ -5,6 +5,7 @@ import bingoImage from "../img/PokemonBingo.png"
 import drawsRemaining from "../img/pokemon_draws_remaining.png"
 import axios from "axios";
 import { Button, Header, Image, Modal } from 'semantic-ui-react'
+import cardBack from "../img/pokemon-card-back-2.png";
 
 
 const Profile = (props) =>{
@@ -141,7 +142,7 @@ const Profile = (props) =>{
             })
             return (
                 <div style={{display:"flex", flexDirection: "column", alignItems: "center"}}>
-                    <div className="ui ordered horizontal list" id="groupMemberList">
+                    <div className="ui ordered horizontal list" id="groupMemberList" style={{width: "fit-content"}}>
                         {displayGroupMembers}
                     </div>
                     <br />
@@ -160,6 +161,7 @@ const Profile = (props) =>{
     }
 
     const newPokemonCard = () => {
+        setPokemonCard(cardBack)
 
         axios.get(`http://localhost:8090/profile/${props.user.id}/draw?draw=yes`)
             .then(response=> {

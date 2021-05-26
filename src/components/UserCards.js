@@ -52,7 +52,7 @@ const UserCards = (props)=>{
     })
 
     return (
-        <div className="bingoCard" style={{height:"600%"}}>
+        <div className="bingoCard" style={{height:"600%", background: "url(https://www.wallpapertip.com/wmimgs/167-1670207_play-nintendo-com-wallpaper-pokemon-red-blue-iphone.jpg)", backgroundSize: "contain"}}>
             {renderedRows}
         </div>
     )

@@ -101,7 +101,7 @@ const BingoCard = (props)=>{
                 return (
                     <div id="bingoGroupInfo">
                         <h1>{props.bingoCard.group.name}</h1>
-                        <div className="ui ordered horizontal list" id="groupMemberList">
+                        <div className="ui ordered horizontal list" id="groupMemberList" style={{height:42}}>
                             {groupMembers}
                         </div>
                     </div>
