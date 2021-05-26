@@ -59,7 +59,6 @@
 @media screen and (min-width:576px) {
     .profilePaths{
         width: 100%;
-        float:left
     }
 
 }
@@ -70,7 +69,6 @@
 @media screen and (min-width:768px) {
     .profilePaths{
         width: 50%;
-        float:left
     }
 }
 
@@ -83,5 +81,19 @@
     opacity: 0.9;
 
 }
+
+#cardCollection{
+    border-radius: 10px;
+    opacity:0.96;
+    background: gold;
+    margin: 25px auto;
+}
+
+#cardCollection .active{
+    background: #3b4cca;
+    color: gold;
+}
+
+
 
 

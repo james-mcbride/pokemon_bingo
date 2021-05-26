@@ -15,7 +15,7 @@ import UserCards from "./UserCards";
 export default()=>{
     const [user, setUser] = useState(null);
     const [selectedBingo, setSelectedBingo] = useState(null)
-    const [userCards, setUserCards]= useState(null);
+    const [userCards, setUserCards]= useState([]);
 
 
     useEffect(()=>{
@@ -97,13 +97,13 @@ export default()=>{
                             {user!==null ? <Redirect to="/profile" /> : <Login setUser={onLogin}/> }
                         </Route>
                         <Route exact path="/profile">
-                            {user===null ? <Redirect to="/login" /> : <Profile setUser={onLogin} user={user}  onSelectBingoCard={onSelectBingoCard} onUpdateCards={onUpdateCards}/>}
+                            {user===null ? <Redirect to="/login" /> : <Profile setUser={onLogin} user={user}  onSelectBingoCard={onSelectBingoCard} onUpdateCards={onUpdateCards} userCards={userCards}/>}
                         </Route>
                         <Route exact path="/profile/cards">
                             {user===null ? <Redirect to="/login" /> : <UserCards cards={userCards} />}
                         </Route>
                         <Route exact path="/bingo/create">
-                            {user===null ? <Redirect to="/login" /> : <CreateBingoCard user={user} onSelectBingoCard={onSelectBingoCard}/>}
+                            {user===null ? <Redirect to="/login" /> : <CreateBingoCard user={user} onSelectBingoCard={onSelectBingoCard} />}
                         </Route>
                         <Route exact path="/group/create">
                             {user===null ? <Redirect to="/login" /> : <CreateGroup user={user} onSelectBingoCard={onSelectBingoCard} />}

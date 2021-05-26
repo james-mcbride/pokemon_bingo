@@ -13,6 +13,8 @@ const Profile = (props) =>{
     const [bingoCards, setBingoCards] = useState([]);
     const [open, setOpen] = useState(false)
     const [pokemonCard, setPokemonCard]=useState(null)
+    const [numCards, setNumCards] = useState(0);
+    const [uniqueCards, setUniqueCards] = useState(0)
 
 
 
@@ -25,8 +27,27 @@ const Profile = (props) =>{
                 // setGroups(response.data.groups);
                 setBingoCards(response.data.bingoCards)
             })
+
+
+
     },[])
 
+    useEffect(()=>{
+        setNumCards(props.userCards.length)
+
+        // will loop through user cards and count unqiue ones
+        let userCardObj={};
+        let counter=0;
+        for (let card of props.userCards){
+            if (userCardObj[card.card.name]){
+            } else{
+                userCardObj[card.card.name]=1
+                counter++
+            }
+        }
+        setUniqueCards(counter)
+
+    },[props.userCards])
 
     const renderedBingoCards = bingoCards.map((bingoCard,index)=>{
         let tabIsActive="";
@@ -47,8 +68,10 @@ const Profile = (props) =>{
     })
 
     const sortBingoCardGroupMembers = (bingoCard) =>{
+        console.log(bingoCard)
         //create an object with groupMembers in it, to track pokemon card matches later on.
-        let groupMembers = [bingoCard.group.groupMembers];
+        let groupMembers = bingoCard.group.groupMembers;
+        console.log(groupMembers)
         let groupMemberObj = {};
 
         //create an object with each bingo card in it.
@@ -63,12 +86,12 @@ const Profile = (props) =>{
 
         //create an object with each groupmember in it.
         for (let groupMember of groupMembers) {
+            console.log(groupMember)
             groupMember.member.bingoMatches = 0;
             groupMemberObj[groupMember.id] = groupMember.member;
 
             //will check groupMember cards to see how many bingo matches they have.
-            let groupMemberCards = props.bingoCard.groupMemberMatches[groupMember.id];
-            console.log(groupMemberCards)
+            let groupMemberCards = bingoCard.groupMemberMatches[groupMember.id];
             for (let cardId of groupMemberCards) {
                 if (bingoCardObj[cardId]) {
                     if (bingoCardObj[cardId].groupMembers && bingoCardObj[cardId].groupMembers[groupMember.member.username] > 0) {
@@ -100,9 +123,10 @@ const Profile = (props) =>{
                 bingoCard=bingoCards[0]
             }
             let sortedGroupMembers=sortBingoCardGroupMembers(bingoCard);
+            console.log(sortedGroupMembers)
             let displayGroupMembers=sortedGroupMembers.map(groupMember=>{
                 return (
-                    <div className="item" style={groupMember.username===props.user.username ? {background: "green",borderRadius: "5px", padding: "5px",opacity: .8, display: "flex",width:"fit-content", float: "left"} : {display:"flex", width: "fit-content", float: "left"}} >
+                    <div className="item" style={groupMember.username===props.user.username ? {background: "green",borderRadius: "5px", padding: "5px",opacity: .8, display: "flex",width:"fit-content", margin: "5px 0"} : {display:"flex", width: "fit-content", margin: "5px 0"}} >
                         <div className="content">
 
                             <div className="header">
@@ -116,11 +140,17 @@ const Profile = (props) =>{
                 )
             })
             return (
-                <Link to={"/group/" + bingoCard.group.id + "/bingo"}>
-                    <div className="ui primary button" onClick={() => props.onSelectBingoCard(bingoCard)}>
-                        View {bingoCard.group.name}'s Bingo Card
+                <div style={{display:"flex", flexDirection: "column", alignItems: "center"}}>
+                    <div className="ui ordered horizontal list" id="groupMemberList">
+                        {displayGroupMembers}
                     </div>
-                </Link>
+                    <br />
+                    <Link to={"/group/" + bingoCard.group.id + "/bingo"}>
+                        <div className="ui primary button" onClick={() => props.onSelectBingoCard(bingoCard)}>
+                            View {bingoCard.group.name}'s Bingo Card
+                        </div>
+                    </Link>
+                </div>
             )
         }else{
             return (
@@ -232,7 +262,7 @@ const Profile = (props) =>{
                 <div className="ui statistics" style={{alignItems: "center"}}>
                     <div className="statistic">
                         <div className="value">
-                            22
+                            {numCards}
                         </div>
                         <div className="label">
                             Cards Drawn
@@ -246,7 +276,7 @@ const Profile = (props) =>{
                     <div className="statistic">
                         <div className="value">
                             <img src="https://cdn.pixabay.com/photo/2019/11/27/14/06/pokemon-4657023_1280.png" className="ui circular inline image" />
-                                42
+                            {uniqueCards}
                         </div>
                         <div className="label">
                             Unique Pokemon
@@ -256,18 +286,16 @@ const Profile = (props) =>{
             </div>
             <div className="profilePaths" id="cardCollection">
                 <h2 style={{textAlign: "center"}}>Your Bingo Cards</h2>
-                <div className="ui grid">
+                <div className="ui grid" style={{margin: 0}}>
                     <div className="four wide column">
-                        <div className="ui vertical fluid tabular menu">
+                        <div className="ui vertical fluid tabular menu" style={{borderRight: "none"}}>
                             {renderedBingoCards}
 
                         </div>
                     </div>
                     <div className="twelve wide stretched column">
                         <div className="ui segment">
-                            <div className="ui ordered horizontal list" id="groupMemberList">
                                 {renderBingoLink()}
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -277,3 +305,4 @@ const Profile = (props) =>{
 }
 
 export default Profile;
+
