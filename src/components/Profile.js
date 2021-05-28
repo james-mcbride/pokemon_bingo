@@ -9,7 +9,6 @@ import cardBack from "../img/pokemon-card-back-2.png";
 
 
 const Profile = (props) =>{
-    console.log(props);
     const [selectedBingo, setSelectedBingo] = useState(null)
     const [bingoCards, setBingoCards] = useState([]);
     const [open, setOpen] = useState(false)
@@ -25,9 +24,35 @@ const Profile = (props) =>{
         axios.get(url)
             .then(response=> {
                 console.log(response);
-                // setGroups(response.data.groups);
+                let dbBingoCards=response.data.bingoCards;
+                //will add all bingoCard groups to obj
+                let bingoObj={};
+                let lastBingoCardId= dbBingoCards[0].id
+                for (let bingoCard of dbBingoCards){
+                    bingoObj[bingoCard.group.id]=true;
+                }
+
+                //will check to see if group has bingoCard, if not, will generate empty one to show group info.
+                let groups=response.data.groups;
+                for (let group of groups){
+                    if (!bingoObj[group.id]){
+                        lastBingoCardId++;
+                        let newBingoObj={
+                            group: group,
+                            groupMemberMatches: {},
+                            cards: [],
+                            id: lastBingoCardId
+                        }
+                        for (let groupMember of group.groupMembers){
+                            newBingoObj.groupMemberMatches[groupMember.id]=[]
+                        }
+                        dbBingoCards.push(newBingoObj)
+                    }
+
+                }
                 setBingoCards(response.data.bingoCards)
             })
+
 
 
 
@@ -49,7 +74,6 @@ const Profile = (props) =>{
         setUniqueCards(counter)
 
     },[props.userCards])
-
     const renderedBingoCards = bingoCards.map((bingoCard,index)=>{
         let tabIsActive="";
         if (selectedBingo!=null) {
@@ -69,10 +93,8 @@ const Profile = (props) =>{
     })
 
     const sortBingoCardGroupMembers = (bingoCard) =>{
-        console.log(bingoCard)
         //create an object with groupMembers in it, to track pokemon card matches later on.
         let groupMembers = bingoCard.group.groupMembers;
-        console.log(groupMembers)
         let groupMemberObj = {};
 
         //create an object with each bingo card in it.
@@ -82,12 +104,10 @@ const Profile = (props) =>{
             bingoCardObj[card.card.pokedexNumber] = card.card;
         }
 
-        console.log(bingoCardObj);
 
 
         //create an object with each groupmember in it.
         for (let groupMember of groupMembers) {
-            console.log(groupMember)
             groupMember.member.bingoMatches = 0;
             groupMemberObj[groupMember.id] = groupMember.member;
 
@@ -115,6 +135,8 @@ const Profile = (props) =>{
 
     }
 
+
+
     const renderBingoLink = () =>{
         if (bingoCards.length>0){
             let bingoCard;
@@ -124,7 +146,6 @@ const Profile = (props) =>{
                 bingoCard=bingoCards[0]
             }
             let sortedGroupMembers=sortBingoCardGroupMembers(bingoCard);
-            console.log(sortedGroupMembers)
             let displayGroupMembers=sortedGroupMembers.map(groupMember=>{
                 return (
                     <div className="item" style={groupMember.username===props.user.username ? {background: "green",borderRadius: "5px", padding: "5px",opacity: .8, display: "flex",width:"fit-content", margin: "5px 0"} : {display:"flex", width: "fit-content", margin: "5px 0"}} >
@@ -146,11 +167,16 @@ const Profile = (props) =>{
                         {displayGroupMembers}
                     </div>
                     <br />
-                    <Link to={"/group/" + bingoCard.group.id + "/bingo"}>
+                    {bingoCard.cards.length>0 ? <Link to={"/group/" + bingoCard.group.id + "/bingo"}>
                         <div className="ui primary button" onClick={() => props.onSelectBingoCard(bingoCard)}>
                             View {bingoCard.group.name}'s Bingo Card
                         </div>
-                    </Link>
+                    </Link> : ""}
+                    {bingoCard.cards.length===0 ? <div className="bingoCard" >
+                        <Link to={"/group/"+bingoCard.group.id+"/bingo/create"} >
+                            <div className="ui primary button" >
+                                Create First Bingo Card</div></Link>
+                    </div> : ""}
                 </div>
             )
         }else{
@@ -171,14 +197,12 @@ const Profile = (props) =>{
 
                 //after drawing new pokemon card, all bingo cards that have a match ar returned, will update the bingo cards on screen with these matches.
                 if (response.data.bingoMatches && response.data.bingoMatches.length>0){
-                    console.log("we have a match")
                     let updatedBingoCards=response.data.bingoMatches;
                     let updatedBingoCardsObj={}
                     for (let bingoCard of updatedBingoCards){
                         bingoCard.notification=true;
                         updatedBingoCardsObj[bingoCard.id]=bingoCard;
                     }
-                    console.log(updatedBingoCardsObj)
 
                     //making a copy of state bingoCards
                     let currentBingoCards=[...bingoCards];
@@ -186,14 +210,12 @@ const Profile = (props) =>{
                     //loop through bingo card array from copy above, and update indexes that have a match.
                     let updatedStateBingoCards=currentBingoCards.map(bingoCard=>{
                         if (updatedBingoCardsObj[bingoCard.id]){
-                            console.log("we have found our match and will update now")
                             return updatedBingoCardsObj[bingoCard.id]
                         } else{
                             return bingoCard
                         }
 
                     })
-                    console.log(updatedStateBingoCards)
                     setBingoCards(updatedStateBingoCards)
                 }
             })

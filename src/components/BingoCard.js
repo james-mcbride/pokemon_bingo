@@ -7,7 +7,7 @@ import {Link} from "react-router-dom";
 
 
 const BingoCard = (props)=>{
-    console.log(props)
+    const groupId=window.location.pathname.split("/")[2];
 
     const [bingoPlayers, setBingoPlayers] = useState([])
     const [pokemonCards, setPokemonCards] = useState([])
@@ -121,7 +121,7 @@ const BingoCard = (props)=>{
         return (
             <div className="bingoCard">
                 Create first Bingo Card!
-                <Link to="/bingo/create">
+                <Link to={"/group/"+groupId+"/bingo/create"}>
                     <div className="ui primary button">
                         Create Bingo Card</div></Link>
             </div>

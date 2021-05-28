@@ -102,7 +102,7 @@ export default()=>{
                         <Route exact path="/profile/cards">
                             {user===null ? <Redirect to="/login" /> : <UserCards cards={userCards} />}
                         </Route>
-                        <Route exact path="/bingo/create">
+                        <Route exact path="/group/:id/bingo/create">
                             {user===null ? <Redirect to="/login" /> : <CreateBingoCard user={user} onSelectBingoCard={onSelectBingoCard} />}
                         </Route>
                         <Route exact path="/group/create">
