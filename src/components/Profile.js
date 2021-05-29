@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import {Link} from "react-router-dom";
 import "../css/Profile.css"
 import bingoImage from "../img/PokemonBingo.png"
-import drawsRemaining from "../img/pokemon_draws_remaining.png"
+import drawsRemainingImage from "../img/pokemon_draws_remaining.png"
 import axios from "axios";
 import { Button, Header, Image, Modal } from 'semantic-ui-react'
 import cardBack from "../img/pokemon-card-back-2.png";
@@ -15,6 +15,7 @@ const Profile = (props) =>{
     const [pokemonCard, setPokemonCard]=useState(null)
     const [numCards, setNumCards] = useState(0);
     const [uniqueCards, setUniqueCards] = useState(0)
+    const [drawsRemaining, setDrawsRemaining] = useState(5);
 
 
 
@@ -27,7 +28,12 @@ const Profile = (props) =>{
                 let dbBingoCards=response.data.bingoCards;
                 //will add all bingoCard groups to obj
                 let bingoObj={};
-                let lastBingoCardId= dbBingoCards[0].id
+                let lastBingoCardId;
+                if (dbBingoCards.length>0) {
+                    lastBingoCardId = dbBingoCards[0].id
+                } else{
+                    lastBingoCardId=0;
+                }
                 for (let bingoCard of dbBingoCards){
                     bingoObj[bingoCard.group.id]=true;
                 }
@@ -59,6 +65,7 @@ const Profile = (props) =>{
     },[])
 
     useEffect(()=>{
+        console.log(props.userCards)
         setNumCards(props.userCards.length)
 
         // will loop through user cards and count unqiue ones
@@ -72,6 +79,20 @@ const Profile = (props) =>{
             }
         }
         setUniqueCards(counter)
+
+        //now will check to see if cards are remaining to draw today
+        // let date = new Date(props.userCards[props.userCards.length-1].createdAt)
+        // console.log(date)
+        let today=new Date();
+        let currentDate = today.toString().split(" ").slice(0,3).join(" ")
+        let todaysDrawnCards=props.userCards.filter(card=>{
+            let cardTime = new Date(card.createdAt);
+            let cardDate=cardTime.toString().split(" ").slice(0,3).join(" ");
+            return currentDate===cardDate;
+        })
+        console.log(todaysDrawnCards.length)
+        setDrawsRemaining(5-todaysDrawnCards.length);
+
 
     },[props.userCards])
     const renderedBingoCards = bingoCards.map((bingoCard,index)=>{
@@ -227,7 +248,7 @@ const Profile = (props) =>{
             onClose={() => setOpen(false)}
             onOpen={() => setOpen(true)}
             open={open}
-            trigger={<Button className="ui yellow button" style={{color: "blue"}} onClick={()=>newPokemonCard()}>Draw Pokemon Card</Button>}
+            trigger={<Button className="ui yellow button" style={{color: "blue"}} onClick={()=>newPokemonCard()} disabled={drawsRemaining===0}>Draw Pokemon Card</Button>}
         >
             <Modal.Header>New Pokemon Card</Modal.Header>
             <Modal.Content image>
@@ -271,9 +292,9 @@ const Profile = (props) =>{
                  <div id="drawCards">
                      <div id="remainingCards">
                          <div>
-                             <h1 id="remainingCardsCounter">{5}</h1>
+                             <h1 id="remainingCardsCounter">{drawsRemaining}</h1>
                              <div style={{padding:10}}>
-                                 <img src={drawsRemaining} style={{width: 200}} />
+                                 <img src={drawsRemainingImage} style={{width: 200}} />
                              </div>
                              {modal}
                          </div>
