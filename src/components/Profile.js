@@ -4,7 +4,7 @@ import "../css/Profile.css"
 import bingoImage from "../img/PokemonBingo.png"
 import drawsRemainingImage from "../img/pokemon_draws_remaining.png"
 import axios from "axios";
-import { Button, Header, Image, Modal } from 'semantic-ui-react'
+import { Button, Header, Image, Modal, Transition } from 'semantic-ui-react'
 import cardBack from "../img/pokemon-card-back-2.png";
 
 
@@ -16,6 +16,8 @@ const Profile = (props) =>{
     const [numCards, setNumCards] = useState(0);
     const [uniqueCards, setUniqueCards] = useState(0)
     const [drawsRemaining, setDrawsRemaining] = useState(5);
+    const [visible, setVisible] = useState(true);
+    const [animation, setAnimation] = useState("shake")
 
 
 
@@ -158,6 +160,13 @@ const Profile = (props) =>{
 
 
 
+    const closeModal=()=>{
+        console.log("changing animation to shake")
+        setAnimation("shake")
+        setOpen(false);
+    }
+
+
     const renderBingoLink = () =>{
         if (bingoCards.length>0){
             let bingoCard;
@@ -208,12 +217,19 @@ const Profile = (props) =>{
     }
 
     const newPokemonCard = () => {
+        setAnimation("shake")
         setPokemonCard(cardBack)
+
+
+        setTimeout(()=>{
 
         axios.get(`http://localhost:8090/profile/${props.user.id}/draw?draw=yes`)
             .then(response=> {
-                console.log(response.data)
+
                 setPokemonCard(response.data.cards[response.data.cards.length-1].card.imageURL);
+                setTimeout(()=> {
+                    setAnimation("tada")
+                },200)
                 props.onUpdateCards(response.data.cards);
 
                 //after drawing new pokemon card, all bingo cards that have a match ar returned, will update the bingo cards on screen with these matches.
@@ -240,19 +256,24 @@ const Profile = (props) =>{
                     setBingoCards(updatedStateBingoCards)
                 }
             })
+        },1500)
+
     }
 
+    console.log("animation before actual html: "+animation)
 
     let modal = (
         <Modal
-            onClose={() => setOpen(false)}
+            onClose={() => closeModal}
             onOpen={() => setOpen(true)}
             open={open}
             trigger={<Button className="ui yellow button" style={{color: "blue"}} onClick={()=>newPokemonCard()} disabled={drawsRemaining===0}>Draw Pokemon Card</Button>}
         >
             <Modal.Header>New Pokemon Card</Modal.Header>
             <Modal.Content image>
-                <Image size='large' src={pokemonCard} style={{textAlign: "center",marginLeft: "auto", marginRight: "auto",height: "500px", objectFit: "contain"}} />
+                <Transition visible={visible} animation={animation} duration={1500}>
+                    <Image className="ui small image scale visible transition" id="pokemonCardImage" size='large' src={pokemonCard} style={{textAlign: "center",marginLeft: "auto", marginRight: "auto",height: "500px", objectFit: "contain"}} />
+                 </Transition>
                 {/*<div className="image content"><img src={pokemonCard} className="ui large image" style="height: 500px;"/></div>*/}
 
                 {/*<Modal.Description>*/}
@@ -271,7 +292,6 @@ const Profile = (props) =>{
             </Modal.Actions>
         </Modal>
     )
-
     return (
         <div id="homeContainer">
             <div id="profileUserDetails">
