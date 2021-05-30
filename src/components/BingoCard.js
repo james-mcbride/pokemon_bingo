@@ -4,6 +4,7 @@ import PokemonCard from './PokemonCard';
 import "../css/BingoCard.css";
 import CardRow from "./CardRow";
 import {Link} from "react-router-dom";
+import axios from "axios";
 
 
 const BingoCard = (props)=>{
@@ -12,8 +13,16 @@ const BingoCard = (props)=>{
     const [bingoPlayers, setBingoPlayers] = useState([])
     const [pokemonCards, setPokemonCards] = useState([])
     const [bingoCardOwner, setBingoCardOwner]= useState(props.user.username)
+    const [bingoCardWinner, setBingoCardWinner]= useState(null);
 
     useEffect(()=>{
+        //first will check to see if there was a winner.\
+        if (props.bingoCard.winner){
+            setBingoCardWinner(props.bingoCard.winner)
+            setBingoCardOwner(props.bingoCard.winner)
+        }
+        console.log(props.bingoCard.cards)
+
         if (props.bingoCard!=null) {
             //create an object with groupMembers in it, to track pokemon card matches later on.
             let groupMembers = [...props.bingoCard.group.groupMembers];
@@ -26,9 +35,6 @@ const BingoCard = (props)=>{
                 bingoCardObj[card.card.pokedexNumber] = card.card;
             }
 
-            console.log(bingoCardObj);
-
-
             //create an object with each groupmember in it.
             for (let groupMember of groupMembers) {
                 groupMember.member.bingoMatches = 0;
@@ -36,7 +42,6 @@ const BingoCard = (props)=>{
 
                 //will check groupMember cards to see how many bingo matches they have.
                 let groupMemberCards = props.bingoCard.groupMemberMatches[groupMember.id];
-                console.log(groupMemberCards)
                 for (let cardId of groupMemberCards) {
                     if (bingoCardObj[cardId]) {
                         if (bingoCardObj[cardId].groupMembers && bingoCardObj[cardId].groupMembers[groupMember.member.username] > 0) {
@@ -46,6 +51,21 @@ const BingoCard = (props)=>{
                             groupMemberObj[groupMember.id].bingoMatches++;
                             bingoCardObj[cardId].groupMembers[groupMember.member.username] = 1;
                         }
+                    }
+                }
+
+                //will only check for winner if there is no current winner
+
+                if (props.bingoCard.winner==null||props.bingoCard.winner=="") {
+                    //if the check for bingo winner function returns true, update page, and send an api call to update database
+                    if (checkForBingoWinner(groupMemberCards, Object.values(bingoCardObj))) {
+                        console.log("found a winner!")
+                        setBingoCardWinner(groupMember.member.username)
+                        let url="http://localhost:8090/groups/"+props.bingoCard.group.id+"/bingo/"+props.bingoCard.id+"/winner"
+                        console.log(groupMember.member.username)
+                        axios.post(url, {
+                            winner: groupMember.member.username
+                        })
                     }
                 }
 
@@ -59,11 +79,80 @@ const BingoCard = (props)=>{
             setBingoPlayers(sortedGroupMembers)
 
             //will set pokemon cards that have groupMember matches tied to them to the state
-            console.log(bingoCardObj)
             setPokemonCards(Object.values(bingoCardObj))
-            console.log(pokemonCards)
         }
     }, [])
+
+    const checkForBingoWinner= (memberCards, bingoCards)=>{
+        //first will load memberCards to object
+        let memberCardsObj={};
+        for (let cardId of memberCards){
+            memberCardsObj[cardId]=true;
+        }
+
+        let bingoArray=[]
+        for (let card of bingoCards){
+            if (memberCardsObj[card.pokedexNumber]){
+                bingoArray.push("X")
+            } else{
+                bingoArray.push ("")
+            }
+        }
+        let multiBingoArray=[bingoArray.slice(0,5), bingoArray.slice(5,10), bingoArray.slice(10,15), bingoArray.slice(15,20), bingoArray.slice(20,25) ]
+        console.log(multiBingoArray)
+        //will check each row horizontally first
+        for (let i=0; i<5; i++){
+            let counter=0;
+            for (let j=0; j<5; j++){
+                if (multiBingoArray[i][j]==="X"){
+                    counter++
+                }
+            }
+            if (counter===5){
+                return true;
+            }
+        }
+
+        //will check each column for winner
+        for (let i=0; i<5; i++){
+            let counter=0;
+            for (let j=0; j<5; j++){
+                if (multiBingoArray[j][i]==="X"){
+                    counter++
+                }
+            }
+            if (counter===5){
+                return true;
+            }
+        }
+
+        //will check for winner diagonally top-left to bottom-right
+        let diagonalCounter=0;
+        for (let i=0, j=0; i<5;i++,j++){
+            if (multiBingoArray[i][j]==="X"){
+                diagonalCounter++
+            }
+        }
+        if (diagonalCounter===5){
+            return true;
+        }
+
+        //will check for winner diagonally bottom-right to top-left
+         diagonalCounter=0;
+        for (let i=4, j=4; i>=0;i--,j--){
+            if (multiBingoArray[i][j]==="X"){
+                diagonalCounter++
+            }
+        }
+        if (diagonalCounter===5){
+            return true;
+        }
+
+
+        return false;
+    }
+
+
 
     if (props.bingoCard!==null) {
         let cards=[]
@@ -84,6 +173,7 @@ const BingoCard = (props)=>{
         const renderGroupInfo=()=>{
             if (props.bingoCard!=null){
                 let groupMembers = bingoPlayers.map(groupMember=>{
+                    console.log(groupMember)
                     return (
                         <div className="item" style={groupMember.username===bingoCardOwner ? {background: "green",borderRadius: "5px", padding: "5px",opacity: .8, display: "flex",width:"fit-content", float: "left"} : {display:"flex", width: "fit-content", float: "left"}} onClick={()=>setBingoCardOwner(groupMember.username)}>
                             <div className="content">
@@ -93,6 +183,7 @@ const BingoCard = (props)=>{
                                         <img src={groupMember.profilePicture} style={{objectFit:"cover", width: "100%"}}/>
                                     </div>
                                     {groupMember.firstName+" "+groupMember.lastName}</div>
+                                {bingoCardWinner===groupMember.username ? <strong>Winner<br /></strong> : ""}
                                 {groupMember.bingoMatches} {groupMember.bingoMatches===1 ? "match" : "matches"}
                             </div>
                         </div>
