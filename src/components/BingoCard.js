@@ -16,14 +16,14 @@ const BingoCard = (props)=>{
     const [bingoCardWinner, setBingoCardWinner]= useState(null);
 
     useEffect(()=>{
-        //first will check to see if there was a winner.\
-        if (props.bingoCard.winner){
-            setBingoCardWinner(props.bingoCard.winner)
-            setBingoCardOwner(props.bingoCard.winner)
-        }
-        console.log(props.bingoCard.cards)
 
         if (props.bingoCard!=null) {
+            //first will check to see if there was a winner.\
+            if (props.bingoCard.winner){
+                setBingoCardWinner(props.bingoCard.winner)
+                setBingoCardOwner(props.bingoCard.winner)
+            }
+
             //create an object with groupMembers in it, to track pokemon card matches later on.
             let groupMembers = [...props.bingoCard.group.groupMembers];
             let groupMemberObj = {};
@@ -191,7 +191,9 @@ const BingoCard = (props)=>{
                 })
                 return (
                     <div id="bingoGroupInfo">
-                        <h1>{props.bingoCard.group.name}</h1>
+                        <Link to={"/group/" + props.bingoCard.group.id}>
+                            <h1 style={{color: "black", marginBottom: 5}}>{props.bingoCard.group.name}</h1>
+                        </Link>
                         <div className="ui ordered horizontal list" id="groupMemberList" style={{height:42}}>
                             {groupMembers}
                         </div>

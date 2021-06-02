@@ -193,13 +193,16 @@ const Profile = (props) =>{
             })
             return (
                 <div style={{display:"flex", flexDirection: "column", alignItems: "center"}}>
+                    <Link to={"/group/" + bingoCard.group.id}>
+                        <h1>{bingoCard.group.name}</h1>
+                    </Link>
                     <div className="ui ordered horizontal list" id="groupMemberList" style={{width: "fit-content"}}>
                         {displayGroupMembers}
                     </div>
                     <br />
                     {bingoCard.cards.length>0 ? <Link to={"/group/" + bingoCard.group.id + "/bingo"}>
                         <div className="ui primary button" onClick={() => props.onSelectBingoCard(bingoCard)}>
-                            View {bingoCard.group.name}'s Bingo Card
+                            View Bingo Card
                         </div>
                     </Link> : ""}
                     {bingoCard.cards.length===0 ? <div className="bingoCard" >

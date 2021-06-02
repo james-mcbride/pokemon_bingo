@@ -10,6 +10,7 @@ import Profile from "./Profile";
 import CreateBingoCard from "./CreateBingoCard";
 import CreateGroup from "./CreateGroup";
 import UserCards from "./UserCards";
+import GroupProfile from "./GroupProfile";
 
 
 export default()=>{
@@ -107,6 +108,9 @@ export default()=>{
                         </Route>
                         <Route exact path="/group/create">
                             {user===null ? <Redirect to="/login" /> : <CreateGroup user={user} onSelectBingoCard={onSelectBingoCard} />}
+                        </Route>
+                        <Route exact path="/group/:id">
+                            {user===null ? <Redirect to="/login" /> : <GroupProfile user={user} onSelectBingoCard={onSelectBingoCard} />}
                         </Route>
 
                     </div>
