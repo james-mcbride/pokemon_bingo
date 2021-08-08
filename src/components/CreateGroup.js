@@ -2,6 +2,7 @@ import React, {useEffect, useState} from "react";
 import "../css/Login.css"
 import axios from "axios";
 import {Redirect} from 'react-router-dom'
+import audio from "../files/133-celadon city.mp3";
 
 
 const Login = (props) =>{
@@ -114,10 +115,13 @@ const Login = (props) =>{
 
     if (newGroup!=null){
         return (<Redirect to={"/group/"+newGroup.id+"/bingo"} />)
-    } else {
+    } else if(props.user) {
 
         return (
             <div id="flexContainer">
+                <audio autoPlay loop>
+                    <source src={audio} type="audio/mpeg"/>
+                </audio>
                 <div id="formDiv">
                     <div className="ui ordered horizontal list" id="groupMemberList">
                         {renderedAddedMembers}
@@ -147,6 +151,8 @@ const Login = (props) =>{
                 </div>
             </div>
         )
+    } else{
+        return <div></div>
     }
 }
 

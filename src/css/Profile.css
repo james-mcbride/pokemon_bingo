@@ -4,9 +4,9 @@
 
 
 #homeContainer{
-    height: 100%;
     background: url(https://cdn.wallpapersafari.com/34/89/82MW34.jpg);
     background-size: cover;
+    min-height:100%;
 
 }
 #profileMenu{

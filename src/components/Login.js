@@ -8,12 +8,16 @@ const Login = (props) =>{
     const [username, setUsername] =useState("");
     const [password, setPassword] =useState("");
     const [errorMessage, setErrorMessage]=useState("")
+    let currentUser = document.cookie;
+    let updatedCookie = currentUser+"; expires=Thu, 18 Dec 2013 12:00:00 UTC"
+    document.cookie = updatedCookie
 
 
     const onLogin = () =>{
         axios.post("http://localhost:8090/login", {
-                username: username,
-                password: password
+            username: username,
+            password: password,
+            alreadyLoggedIn: false
         })
             .then(response=> {
                 console.log(response.data)
@@ -22,6 +26,7 @@ const Login = (props) =>{
                     setErrorMessage("Invalid Login, try again!")
                 } else {
                     props.setUser(response.data)
+                    document.cookie = `username=${response.data.username}`
                 }
             })
     }
@@ -42,7 +47,7 @@ const Login = (props) =>{
                                onChange={event => setPassword(event.target.value)}/>
                     </div>
 
-                    <button className="ui button" type="button" onClick={() => onLogin()}>Submit</button>
+                    <button className="ui button" type="button" onClick={() => onLogin()}>Login</button>
                     <a href="/register"><button className="ui button" type="button" style={{float: "Right", background: "gold"}}>Not a user? Register!</button></a>
                     <div style={{ color: "red"}}>{errorMessage}</div>
                 </form>

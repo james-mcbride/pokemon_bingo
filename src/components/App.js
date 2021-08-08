@@ -18,7 +18,6 @@ export default()=>{
     const [selectedBingo, setSelectedBingo] = useState(null)
     const [userCards, setUserCards]= useState([]);
 
-
     useEffect(()=>{
 
         // pokemon.card.where({ q: 'set.id:base4' })
@@ -40,11 +39,30 @@ export default()=>{
         //         console.log(response);
         //         setGroups(response.data)
         //     })
-
-
-
+        if (!user && getUsernameFromCookie()){
+            axios.post("http://localhost:8090/login", {
+                username: getUsernameFromCookie(),
+                alreadyLoggedIn: true
+            })
+                .then(response => {
+                    setUser(response.data)
+                    axios.get(`http://localhost:8090/profile/${response.data.id}/draw?draw=no`)
+                        .then(response2=> {
+                            onUpdateCards(response2.data.cards);
+                        })
+                })
+        }
 
     },[])
+    //
+    function getUsernameFromCookie(){
+        let decodedCookie = decodeURIComponent(document.cookie);
+        if (decodedCookie) {
+            return decodedCookie.split("=")[1]
+        } else{
+            return null
+        }
+    }
 
     const onLogin = (loggedInUser) =>{
         setUser(loggedInUser)
@@ -74,8 +92,8 @@ export default()=>{
                 <BrowserRouter>
                     <div id="routerContainer">
                         <div className="ui menu green" style={{background: "green", marginBottom: 0}}>
-                            {user!=null ? <Link to="/profile"><a className="item">Home</a></Link> : ""}
-                            {user!=null ? <Link to="/profile/cards"><a className="item">View cards</a></Link> : ""}
+                            {user!=null ? <Link to={"/profile/"+user.id}><a className="item">Home</a></Link> : ""}
+                            {user!=null ? <Link to={"/profile/"+user.id+"/cards"}><a className="item">View cards</a></Link> : ""}
                             {user!=null ? <Link to="/group/create"><a className="item">Create Group</a></Link> : ""}
 
                             <div className="right menu">
@@ -86,31 +104,31 @@ export default()=>{
                             </div>
                         </div>
                         <Route exact path="/">
-                            {user===null ? <Redirect to="/login" /> : <Home setUser={onLogin}/>}
+                            {user===null && !getUsernameFromCookie() ? <Redirect to="/login" /> : <Home setUser={onLogin}/>}
                         </Route>
                         <Route exact path="/group/:id/bingo">
-                            {user===null ? <Redirect to="/profile" /> : <BingoCard bingoCard={selectedBingo} user={user}/>}
+                            {user===null && !getUsernameFromCookie() ? <Redirect to="/profile" /> : <BingoCard bingoCard={selectedBingo} user={user}/>}
                         </Route>
                         <Route exact path="/register">
-                            {user!==null ? <Redirect to="/profile" /> : <Register setUser={onLogin}/>}
+                            {user!==null && !getUsernameFromCookie() ? <Redirect to="/profile" /> : <Register setUser={onLogin}/>}
                         </Route>
                         <Route exact path="/login">
-                            {user!==null ? <Redirect to="/profile" /> : <Login setUser={onLogin}/> }
+                            {user!==null && !getUsernameFromCookie() ? <Redirect to={"/profile/" + user.id} /> : <Login setUser={onLogin}/> }
                         </Route>
-                        <Route exact path="/profile">
-                            {user===null ? <Redirect to="/login" /> : <Profile setUser={onLogin} user={user}  onSelectBingoCard={onSelectBingoCard} onUpdateCards={onUpdateCards} userCards={userCards}/>}
+                        <Route exact path="/profile/:id">
+                            {user===null && !getUsernameFromCookie() ? <Redirect to="/login" /> : <Profile setUser={onLogin} user={user}  onSelectBingoCard={onSelectBingoCard} onUpdateCards={onUpdateCards} userCards={userCards}/>}
                         </Route>
-                        <Route exact path="/profile/cards">
-                            {user===null ? <Redirect to="/login" /> : <UserCards cards={userCards} />}
+                        <Route exact path="/profile/:id/cards">
+                            {user===null && !getUsernameFromCookie() ? <Redirect to="/login" /> : <UserCards cards={userCards} />}
                         </Route>
                         <Route exact path="/group/:id/bingo/create">
-                            {user===null ? <Redirect to="/login" /> : <CreateBingoCard user={user} onSelectBingoCard={onSelectBingoCard} />}
+                            {user===null && !getUsernameFromCookie() ? <Redirect to="/login" /> : <CreateBingoCard user={user} onSelectBingoCard={onSelectBingoCard} />}
                         </Route>
                         <Route exact path="/group/create">
-                            {user===null ? <Redirect to="/login" /> : <CreateGroup user={user} onSelectBingoCard={onSelectBingoCard} />}
+                            {user===null && !getUsernameFromCookie() ? <Redirect to="/login" /> : <CreateGroup user={user} onSelectBingoCard={onSelectBingoCard} />}
                         </Route>
                         <Route exact path="/group/:id">
-                            {user===null ? <Redirect to="/login" /> : <GroupProfile user={user} onSelectBingoCard={onSelectBingoCard} />}
+                            {user===null && !getUsernameFromCookie() ? <Redirect to="/login" /> : <GroupProfile user={user} onSelectBingoCard={onSelectBingoCard} />}
                         </Route>
 
                     </div>

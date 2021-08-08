@@ -51,8 +51,7 @@ const PokemonCard = ({card, owner}) => {
             setFlippedStatus(false);
         }
     }
-
-
+    console.log(card)
     if (card===null||card===undefined){
 
         return (

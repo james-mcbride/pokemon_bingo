@@ -33,6 +33,7 @@ const Register = (props) =>{
                 .then(response=> {
                     console.log(response);
                     props.setUser(response.data)
+                    document.cookie = `username=${response.data.username}`
                 })
     }
 

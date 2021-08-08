@@ -6,6 +6,8 @@ import drawsRemainingImage from "../img/pokemon_draws_remaining.png"
 import axios from "axios";
 import { Button, Header, Image, Modal, Transition } from 'semantic-ui-react'
 import cardBack from "../img/pokemon-card-back-2.png";
+import audio from "../files/106-the road to viridian city - from palette.mp3"
+import cardDraw from "../files/108-victory (vs wild pokemon).mp3"
 
 
 const Profile = (props) =>{
@@ -18,62 +20,85 @@ const Profile = (props) =>{
     const [drawsRemaining, setDrawsRemaining] = useState(5);
     const [visible, setVisible] = useState(true);
     const [animation, setAnimation] = useState("shake")
-
-
+    const audioFile = document.getElementById("cardDrawAudio")
+    const backgroundAudio = document.getElementById("backgroundMusic")
+    const [isUsersProfile, setIsUsersProfile] = useState(false)
+    const [profileOwnerId, setProfileOwnerId] = useState(null)
+    const [cards, setCards] = useState([])
+    const [user, setUser] = useState([])
 
     useEffect(()=>{
         //will do a separate ajax call to get all bingo cards
-        let url="http://localhost:8090/profile/"+props.user.id+"/bingoCard"
-        axios.get(url)
-            .then(response=> {
-                console.log(response);
-                let dbBingoCards=response.data.bingoCards;
-                //will add all bingoCard groups to obj
-                let bingoObj={};
-                let lastBingoCardId;
-                if (dbBingoCards.length>0) {
-                    lastBingoCardId = dbBingoCards[0].id
-                } else{
-                    lastBingoCardId=0;
-                }
-                for (let bingoCard of dbBingoCards){
-                    bingoObj[bingoCard.group.id]=true;
-                }
-
-                //will check to see if group has bingoCard, if not, will generate empty one to show group info.
-                let groups=response.data.groups;
-                for (let group of groups){
-                    if (!bingoObj[group.id]){
-                        lastBingoCardId++;
-                        let newBingoObj={
-                            group: group,
-                            groupMemberMatches: {},
-                            cards: [],
-                            id: lastBingoCardId
-                        }
-                        for (let groupMember of group.groupMembers){
-                            newBingoObj.groupMemberMatches[groupMember.id]=[]
-                        }
-                        dbBingoCards.push(newBingoObj)
+        if (props.user) {
+            const userId = window.location.pathname.split("/")[2];
+            setIsUsersProfile(props.user.id == userId)
+            let url = "http://localhost:8090/profile/" + userId + "/bingoCard"
+            axios.get(url)
+                .then(response => {
+                    console.log(response);
+                    let dbBingoCards = response.data.bingoCards;
+                    //will add all bingoCard groups to obj
+                    let bingoObj = {};
+                    let lastBingoCardId;
+                    if (dbBingoCards.length > 0) {
+                        lastBingoCardId = dbBingoCards[0].id
+                    } else {
+                        lastBingoCardId = 0;
+                    }
+                    for (let bingoCard of dbBingoCards) {
+                        bingoObj[bingoCard.group.id] = true;
                     }
 
-                }
-                setBingoCards(response.data.bingoCards)
-            })
+                    //will check to see if group has bingoCard, if not, will generate empty one to show group info.
+                    let groups = response.data.groups;
+                    for (let group of groups) {
+                        if (!bingoObj[group.id]) {
+                            lastBingoCardId++;
+                            let newBingoObj = {
+                                group: group,
+                                groupMemberMatches: {},
+                                cards: [],
+                                id: lastBingoCardId
+                            }
+                            for (let groupMember of group.groupMembers) {
+                                newBingoObj.groupMemberMatches[groupMember.id] = []
+                            }
+                            dbBingoCards.push(newBingoObj)
+                        }
 
+                    }
+                    setBingoCards(response.data.bingoCards)
+                })
+            if (!isUsersProfile){
+                axios.get("http://localhost:8090/profile/"+userId)
+                    .then(response => {
+                        console.log(response)
+                        setUser(response.data.user)
+                        setCards(response.data.cards)
+                    })
+            } else{
+                setCards(props.userCards);
+                setUser(props.user)
+            }
 
-
-
-    },[])
+        }
+    },[props.user, profileOwnerId, props.userCards])
 
     useEffect(()=>{
-        console.log(props.userCards)
-        setNumCards(props.userCards.length)
+        let currentUrlProfileId=window.location.pathname.split("/")[2]
+        if (profileOwnerId!==currentUrlProfileId){
+            setProfileOwnerId(currentUrlProfileId)
+        }
+    }, [profileOwnerId])
+
+
+    useEffect(()=>{
+        setNumCards(cards.length)
 
         // will loop through user cards and count unqiue ones
         let userCardObj={};
         let counter=0;
-        for (let card of props.userCards){
+        for (let card of cards){
             if (userCardObj[card.card.name]){
             } else{
                 userCardObj[card.card.name]=1
@@ -87,7 +112,7 @@ const Profile = (props) =>{
         // console.log(date)
         let today=new Date();
         let currentDate = today.toString().split(" ").slice(0,3).join(" ")
-        let todaysDrawnCards=props.userCards.filter(card=>{
+        let todaysDrawnCards=cards.filter(card=>{
             let cardTime = new Date(card.createdAt);
             let cardDate=cardTime.toString().split(" ").slice(0,3).join(" ");
             return currentDate===cardDate;
@@ -96,7 +121,7 @@ const Profile = (props) =>{
         setDrawsRemaining(5-todaysDrawnCards.length);
 
 
-    },[props.userCards])
+    },[cards])
     const renderedBingoCards = bingoCards.map((bingoCard,index)=>{
         let tabIsActive="";
         if (selectedBingo!=null) {
@@ -164,6 +189,11 @@ const Profile = (props) =>{
         console.log("changing animation to shake")
         setAnimation("shake")
         setOpen(false);
+        audioFile.pause()
+        setTimeout(function(){
+            backgroundAudio.play()
+
+        },200)
     }
 
 
@@ -178,14 +208,16 @@ const Profile = (props) =>{
             let sortedGroupMembers=sortBingoCardGroupMembers(bingoCard);
             let displayGroupMembers=sortedGroupMembers.map(groupMember=>{
                 return (
-                    <div className="item" style={groupMember.username===props.user.username ? {background: "green",borderRadius: "5px", padding: "5px",opacity: .8, display: "flex",width:"fit-content", margin: "5px 0"} : {display:"flex", width: "fit-content", margin: "5px 0"}} >
+                    <div className="item" style={groupMember.username===user.username ? {background: "green",borderRadius: "5px", padding: "5px",opacity: .8, display: "flex",width:"fit-content", margin: "5px 0"} : {display:"flex", width: "fit-content", margin: "5px 0", fontSize:'medium'}} >
                         <div className="content">
 
-                            <div className="header">
+                            <a href={"/profile/"+groupMember.id} >
+                                <div className="header">
                                 <div style={{width:40, height:35, overflow: "hidden", borderRadius: "50%", margin: "0 5px", float: "left"}}>
                                     <img src={groupMember.profilePicture} style={{objectFit:"cover", width: "100%"}}/>
                                 </div>
                                 {groupMember.firstName+" "+groupMember.lastName}</div>
+                            </a>
                             {groupMember.bingoMatches} {groupMember.bingoMatches===1 ? "match" : "matches"}
                         </div>
                     </div>
@@ -220,13 +252,17 @@ const Profile = (props) =>{
     }
 
     const newPokemonCard = () => {
+
+        backgroundAudio.pause()
+        audioFile.currentTime = 0;
+        audioFile.play()
         setAnimation("shake")
         setPokemonCard(cardBack)
 
 
         setTimeout(()=>{
 
-        axios.get(`http://localhost:8090/profile/${props.user.id}/draw?draw=yes`)
+        axios.get(`http://localhost:8090/profile/${user.id}/draw?draw=yes`)
             .then(response=> {
 
                 setPokemonCard(response.data.cards[response.data.cards.length-1].card.imageURL);
@@ -263,14 +299,13 @@ const Profile = (props) =>{
 
     }
 
-    console.log("animation before actual html: "+animation)
 
     let modal = (
         <Modal
             onClose={() => closeModal}
             onOpen={() => setOpen(true)}
             open={open}
-            trigger={<Button className="ui yellow button" style={{color: "blue"}} onClick={()=>newPokemonCard()} disabled={drawsRemaining===0}>Draw Pokemon Card</Button>}
+            trigger={<Button className="ui yellow button" style={{color: "blue"}} onClick={()=>newPokemonCard()} disabled={drawsRemaining===0 || !isUsersProfile}>Draw Pokemon Card</Button>}
         >
             <Modal.Header>New Pokemon Card</Modal.Header>
             <Modal.Content image>
@@ -289,87 +324,102 @@ const Profile = (props) =>{
                 {/*</Modal.Description>*/}
             </Modal.Content>
             <Modal.Actions style={{textAlign: "center"}}>
-                <Button color='black'  onClick={() => setOpen(false)}>
+                <Button color='black'  onClick={() => closeModal()}>
                     Return Home
                 </Button>
             </Modal.Actions>
         </Modal>
     )
-    return (
-        <div id="homeContainer">
-            <div id="profileUserDetails">
-                <div id="profileImage">
-                    <div style={{
-                        width: 150,
-                        height: 130,
-                        overflow: "hidden",
-                        borderRadius: "50%",
-                        margin: "0 auto",
-                        textAlign:"center",
-                        border: "3px solid gold"
-                    }}>
-                        <img src={props.user.profilePicture} style={{objectFit: "cover", width: "100%"}}/>
+    if (user) {
+        return (
+            <div id="homeContainer">
+                <audio autoPlay loop id="backgroundMusic" controls>
+                    <source src={audio} type="audio/mpeg"/>
+                </audio>
+                <audio id="cardDrawAudio">
+                    <source src={cardDraw} type="audio/mpeg"/>
+                </audio>
+                <div id="profileUserDetails">
+                    <div id="profileImage">
+                        <div style={{
+                            width: 150,
+                            height: 130,
+                            overflow: "hidden",
+                            borderRadius: "50%",
+                            margin: "0 auto",
+                            textAlign: "center",
+                            border: "3px solid gold"
+                        }}>
+                            <img src={user.profilePicture} style={{objectFit: "cover", width: "100%"}}/>
+                        </div>
+                        <h3 style={{
+                            textAlign: "center",
+                            marginTop: 10
+                        }}>{user.firstName + " " + user.lastName}</h3>
                     </div>
-                    <h3 style={{textAlign: "center", marginTop: 10}}>{props.user.firstName + " " + props.user.lastName}</h3>
-                </div>
-                 <div id="drawCards">
-                     <div id="remainingCards">
-                         <div>
-                             <h1 id="remainingCardsCounter">{drawsRemaining}</h1>
-                             <div style={{padding:10}}>
-                                 <img src={drawsRemainingImage} style={{width: 200}} />
-                             </div>
-                             {modal}
-                         </div>
+                    <div id="drawCards">
+                        <div id="remainingCards">
+                            <div>
+                                <h1 id="remainingCardsCounter">{drawsRemaining}</h1>
+                                <div style={{padding: 10}}>
+                                    <img src={drawsRemainingImage} style={{width: 200}}/>
+                                </div>
+                                {modal}
+                            </div>
 
-                     </div>
+                        </div>
 
-                 </div>
-            </div>
-            <div id="userCardStats">
-                <div className="ui statistics" style={{alignItems: "center"}}>
-                    <div className="statistic">
-                        <div className="value">
-                            {numCards}
-                        </div>
-                        <div className="label">
-                            Cards Drawn
-                        </div>
-                    </div>
-                    <div className="statistics">
-                        <Link to="/profile/cards">
-                            <button className="ui red button">View<br/> Collection!</button>
-                        </Link>
-                    </div>
-                    <div className="statistic">
-                        <div className="value">
-                            <img src="https://cdn.pixabay.com/photo/2019/11/27/14/06/pokemon-4657023_1280.png" className="ui circular inline image" />
-                            {uniqueCards}
-                        </div>
-                        <div className="label">
-                            Unique Pokemon
-                        </div>
                     </div>
                 </div>
-            </div>
-            <div className="profilePaths" id="cardCollection">
-                <h2 style={{textAlign: "center"}}>Your Bingo Cards</h2>
-                <div className="ui grid" style={{margin: 0}}>
-                    <div className="four wide column">
-                        <div className="ui vertical fluid tabular menu" style={{borderRight: "none"}}>
-                            {renderedBingoCards}
-
+                <div id="userCardStats">
+                    <div className="ui statistics" style={{alignItems: "center"}}>
+                        <div className="statistic">
+                            <div className="value">
+                                {numCards}
+                            </div>
+                            <div className="label">
+                                Cards Drawn
+                            </div>
+                        </div>
+                        <div className="statistics">
+                            <Link to={"/profile/"+user.id+"/cards"}>
+                                <button className="ui red button">View<br/> Collection!</button>
+                            </Link>
+                        </div>
+                        <div className="statistic">
+                            <div className="value">
+                                <img src="https://cdn.pixabay.com/photo/2019/11/27/14/06/pokemon-4657023_1280.png"
+                                     className="ui circular inline image"/>
+                                {uniqueCards}
+                            </div>
+                            <div className="label">
+                                Unique Pokemon
+                            </div>
                         </div>
                     </div>
-                    <div className="twelve wide stretched column">
-                        <div className="ui segment">
+                </div>
+                <div className="profilePaths" id="cardCollection">
+                    <h2 style={{textAlign: "center"}}>Your Bingo Cards</h2>
+                    <div className="ui grid" style={{margin: 0, minHeight:400}}>
+                        <div className="four wide column" style={{overflowY: "scroll"}}>
+                            <div className="ui vertical fluid tabular menu"
+                                 style={{borderRight: "none", position: "absolute"}}>
+                                {renderedBingoCards}
+
+                            </div>
+                        </div>
+                        <div className="twelve wide stretched column" style={{height: "fit-content"}}>
+                            <div className="ui segment">
                                 {renderBingoLink()}
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    )
+        )
+    } else{
+        return <div></div>
+    }
 }
 
 export default Profile;

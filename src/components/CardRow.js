@@ -13,7 +13,7 @@ const CardRow = ({cards, owner})=>{
         )
     })
     return (
-        <div className="bingoRow" style={url.indexOf("profile/cards")!==-1 ? {height:"3.33%"} : {height:"17%"}}>
+        <div className="bingoRow" style={url.indexOf("/cards")!==-1 ? {height:"3.33%"} : {height:"17%"}}>
             {renderedCards}
         </div>
     )

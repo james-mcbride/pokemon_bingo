@@ -5,6 +5,7 @@ import "../css/BingoCard.css";
 import CardRow from "./CardRow";
 import {Link} from "react-router-dom";
 import axios from "axios";
+import audio from "../files/133-celadon city.mp3";
 
 
 const BingoCard = (props)=>{
@@ -191,6 +192,9 @@ const BingoCard = (props)=>{
                 })
                 return (
                     <div id="bingoGroupInfo">
+                        <audio autoPlay loop id="backgroundMusic">
+                            <source src={audio} type="audio/mpeg"/>
+                        </audio>
                         <Link to={"/group/" + props.bingoCard.group.id}>
                             <h1 style={{color: "black", marginBottom: 5}}>{props.bingoCard.group.name}</h1>
                         </Link>
